@@ -12,3 +12,6 @@ Current version: 0.5
 - AngelScript Update().
 - Some other miscellaneous functions:
 	- TBD
+
+## Compiling:
+Should be as simple as BUzzer's x64 fork.
