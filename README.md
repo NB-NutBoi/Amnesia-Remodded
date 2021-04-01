@@ -11,7 +11,7 @@ Current version: 0.9.1
 - A way to remove notes from the journal.
 - AngelScript Update().
 - Some other miscellaneous functions:
-	- TBD
+	- Getting rotation of player camera/entities
 
 ## Compiling:
 Should be as simple as BUzzer's x64 fork.
