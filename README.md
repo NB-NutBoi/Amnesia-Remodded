@@ -3,7 +3,7 @@ A modified game executable using BUzzer's x64 fork that adds a bunch of new func
 
 Made by NutBoi with the help of the Frictional games discord community.
 
-Current version: 0.5
+Current version: 0.9.1
 
 ## Key changes:
 - Infinite lanterns.
