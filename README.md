@@ -1,7 +1,7 @@
 # Amnesia : Remodded
 A modified game executable using BUzzer's x64 fork that adds a bunch of new functions and options for modders to play around with.
 
-Made by NutBoi with the help of the Frictional games discord community.
+Made by NutBoi & Nate with the help of the Frictional games discord community.
 
 Current version: 0.9.1
 
