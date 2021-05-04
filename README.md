@@ -4,6 +4,7 @@ A modified game executable using BUzzer's x64 fork that adds a bunch of new func
 Made by NutBoi & Nate with the help of the Frictional games discord community.
 
 Current version: 1.1 PREVIEW
+
 SOME THINGS WONT WORK OR AREN'T FULLY IMPLEMENTED, ALSO YOU CANT COMPILE DUE TO ERRORS
 
 ## Key changes:
