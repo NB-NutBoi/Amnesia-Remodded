@@ -7,6 +7,8 @@ Current version: 1.1 PREVIEW
 
 SOME THINGS WONT WORK OR AREN'T FULLY IMPLEMENTED!
 
+Also linux and mac are currently not supported to my knowledge, if you want to make a port for them, feel free to, the more people who can use this, the better.
+
 ## Key changes:
 - Infinite lanterns.
 - Multiple arms (not fully working as expected yet).
