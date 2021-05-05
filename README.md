@@ -5,7 +5,7 @@ Made by NutBoi & Nate with the help of the Frictional games discord community.
 
 Current version: 1.1 PREVIEW
 
-SOME THINGS WONT WORK OR AREN'T FULLY IMPLEMENTED, ALSO YOU CANT COMPILE DUE TO ERRORS
+SOME THINGS WONT WORK OR AREN'T FULLY IMPLEMENTED!
 
 ## Key changes:
 - Infinite lanterns.
