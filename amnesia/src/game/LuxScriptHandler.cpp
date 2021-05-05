@@ -524,9 +524,10 @@ void cLuxScriptHandler::InitScriptFunctions()
 	AddFunc("void DisableDeathStartSound()",(void *)DisableDeathStartSound);
 
 	AddFunc("void SetLantern(int alLantern)",(void *)SetLantern);
-	AddFunc("void GetLantern()",(void *)GetLantern);
+	AddFunc("int GetLantern()",(void *)GetLantern);
+	AddFunc("bool IsHardMode()",(void *)IsHardMode);
 	AddFunc("void SetArm(int alArm)",(void *)SetArm);
-	AddFunc("void GetArm()",(void *)GetArm);
+	AddFunc("int GetArm()",(void *)GetArm);
 
 	AddFunc("void AddNote(string &in asNameAndTextEntry, string &in asImage)",(void *)AddNote);
 
@@ -593,11 +594,21 @@ void cLuxScriptHandler::InitScriptFunctions()
 	AddFunc("float GetCameraRotationY()",(void *)GetCameraRotationY);
 	AddFunc("float GetCameraRotationZ()",(void *)GetCameraRotationZ);
 
-	AddFunc("float GetEntityRotationX(string &in asName)",(void *)GetEntityRotationX);
-	AddFunc("float GetEntityRotationY(string &in asName)",(void *)GetEntityRotationY);
-	AddFunc("float GetEntityRotationZ(string &in asName)",(void *)GetEntityRotationZ);
+	AddFunc("float GetEntityRotationX(string &in asName, int body)",(void *)GetEntityRotationX);
+	AddFunc("float GetEntityRotationY(string &in asName, int body)",(void *)GetEntityRotationY);
+	AddFunc("float GetEntityRotationZ(string &in asName, int body)",(void *)GetEntityRotationZ);
 
-	AddFunc("float SetEntityRotation(string &in asName, float afX, float afY, float afZ, int body)",(void *)SetEntityRotation);
+	AddFunc("float GetBonePosX(string &in asEntity, string &in asBone)",(void *)GetBonePosX);
+	AddFunc("float GetBonePosY(string &in asEntity, string &in asBone)",(void *)GetBonePosY);
+	AddFunc("float GetBonePosZ(string &in asEntity, string &in asBone)",(void *)GetBonePosZ);
+
+	AddFunc("float GetBoneRotX(string &in asEntity, string &in asBone)",(void *)GetBoneRotX);
+	AddFunc("float GetBoneRotY(string &in asEntity, string &in asBone)",(void *)GetBoneRotY);
+	AddFunc("float GetBoneRotZ(string &in asEntity, string &in asBone)",(void *)GetBoneRotZ);
+
+	AddFunc("void SetEntityRotation(string &in asName, float afX, float afY, float afZ, int body)",(void *)SetEntityRotation);
+
+	AddFunc("float fLerp(float a, float b, float t)", (void*)fLerp);
 
 	AddFunc("void SetEntityCustomFocusCrossHair(string &in asName, string &in asCrossHair)",(void *)SetEntityCustomFocusCrossHair);
 	AddFunc("void CreateEntityAtArea(string &in asEntityName, string &in asEntityFile, string &in asAreaName, bool abFullGameSave)",(void *)CreateEntityAtArea);
@@ -620,6 +631,9 @@ void cLuxScriptHandler::InitScriptFunctions()
 	AddFunc("void AddAttachedPropToProp(string& asPropName, string& asAttachName, string& asAttachFile, float fPosX, float fPosY, float fPosZ, float fRotX, float fRotY, float fRot)",(void *)AddAttachedPropToProp);
 	AddFunc("void AttachPropToProp(string& asPropName, string& asAttachName, string& asAttachFile, float fPosX, float fPosY, float fPosZ, float fRotX, float fRotY, float fRot)",(void *)AttachPropToProp);
 	AddFunc("void RemoveAttachedPropFromProp(string& asPropName, string& asAttachName)",(void *)RemoveAttachedPropFromProp);
+
+	AddFunc("void AttachPlayerCameraToEntity(string& asProp)",(void *)AttachPlayerCameraToEntity);
+	AddFunc("void DetachPlayerCamera()",(void *)DetachPlayerCamera);
 
 	AddFunc("void SetLampLit(string &in asName, bool abLit, bool abEffects)",(void *)SetLampLit); 
 	AddFunc("void SetSwingDoorLocked(string &in asName, bool abLocked, bool abEffects)",(void *)SetSwingDoorLocked);
@@ -1700,6 +1714,13 @@ int __stdcall cLuxScriptHandler::GetLantern()
 
 //-----------------------------------------------------------------------
 
+bool __stdcall cLuxScriptHandler::IsHardMode() 
+{
+	return gpBase->mbHardMode;
+}
+
+//-----------------------------------------------------------------------
+
 void __stdcall cLuxScriptHandler::SetArm(int alArm)
 {
 	gpBase->mpPlayer->GetHands()->SetHands(alArm);
@@ -2434,7 +2455,7 @@ float __stdcall cLuxScriptHandler::GetCameraRotationZ()
 
 //-----------------------------------------------------------------------
 
-float __stdcall cLuxScriptHandler::GetEntityRotationX(string& asName) {
+float __stdcall cLuxScriptHandler::GetEntityRotationX(string& asName, int body) {
 	iLuxEntity* pEntity = GetEntity(asName, eLuxEntityType_LastEnum, -1);
 
 	if (pEntity == NULL) return 0;
@@ -2444,7 +2465,14 @@ float __stdcall cLuxScriptHandler::GetEntityRotationX(string& asName) {
 		Error("Could not get rotation of entity '%s' because it has no physics body!\n", asName.c_str());
 		return 0;
 	}
-	cVector3f fRot = cMath::MatrixToEulerAngles(pEntity->GetBody(0)->GetLocalMatrix(), eEulerRotationOrder_XYZ);
+
+	if (pEntity->GetBody(body) == NULL)
+	{
+		Error("'%s' does not have the body requested!\n", asName.c_str());
+		return 0;
+	}
+
+	cVector3f fRot = cMath::MatrixToEulerAngles(pEntity->GetBody(body)->GetLocalMatrix(), eEulerRotationOrder_XYZ);
 
 	return fRot.x;
 
@@ -2452,7 +2480,7 @@ float __stdcall cLuxScriptHandler::GetEntityRotationX(string& asName) {
 
 //-----------------------------------------------------------------------
 
-float __stdcall cLuxScriptHandler::GetEntityRotationY(string& asName) {
+float __stdcall cLuxScriptHandler::GetEntityRotationY(string& asName, int body) {
 	iLuxEntity* pEntity = GetEntity(asName, eLuxEntityType_LastEnum, -1);
 
 	if (pEntity == NULL) return 0;
@@ -2462,7 +2490,14 @@ float __stdcall cLuxScriptHandler::GetEntityRotationY(string& asName) {
 		Error("Could not get rotation of entity '%s' because it has no physics body!\n", asName.c_str());
 		return 0;
 	}
-	cVector3f fRot = cMath::MatrixToEulerAngles(pEntity->GetBody(0)->GetLocalMatrix(), eEulerRotationOrder_XYZ);
+
+	if (pEntity->GetBody(body) == NULL)
+	{
+		Error("'%s' does not have the body requested!\n", asName.c_str());
+		return 0;
+	}
+
+	cVector3f fRot = cMath::MatrixToEulerAngles(pEntity->GetBody(body)->GetLocalMatrix(), eEulerRotationOrder_XYZ);
 
 	return fRot.y;
 
@@ -2470,7 +2505,7 @@ float __stdcall cLuxScriptHandler::GetEntityRotationY(string& asName) {
 
 //-----------------------------------------------------------------------
 
-float __stdcall cLuxScriptHandler::GetEntityRotationZ(string& asName) {
+float __stdcall cLuxScriptHandler::GetEntityRotationZ(string& asName, int body) {
 	iLuxEntity* pEntity = GetEntity(asName, eLuxEntityType_LastEnum, -1);
 
 	if (pEntity == NULL) return 0;
@@ -2480,7 +2515,14 @@ float __stdcall cLuxScriptHandler::GetEntityRotationZ(string& asName) {
 		Error("Could not get rotation of entity '%s' because it has no physics body!\n", asName.c_str());
 		return 0;
 	}
-	cVector3f fRot = cMath::MatrixToEulerAngles(pEntity->GetBody(0)->GetLocalMatrix(), eEulerRotationOrder_XYZ);
+
+	if (pEntity->GetBody(body) == NULL)
+	{
+		Error("'%s' does not have the body requested!\n", asName.c_str());
+		return 0;
+	}
+
+	cVector3f fRot = cMath::MatrixToEulerAngles(pEntity->GetBody(body)->GetLocalMatrix(), eEulerRotationOrder_XYZ);
 
 	return fRot.z;
 }
@@ -2501,6 +2543,12 @@ void __stdcall cLuxScriptHandler::SetEntityRotation(string& asName, float afX, f
 		return;
 	}
 
+	if (pEntity->GetBody(body) == NULL)
+	{
+		Error("'%s' does not have the body requested!\n", asName.c_str());
+		return;
+	}
+
 	cMatrixf pMatrix = pEntity->GetBody(body)->GetWorldMatrix();
 
 	cMatrixf mtxTrans2 = cMath::MatrixRotate(mvRot, eEulerRotationOrder_XYZ);
@@ -2508,6 +2556,57 @@ void __stdcall cLuxScriptHandler::SetEntityRotation(string& asName, float afX, f
 	cMatrixf mtxTrans = mtxTrans2;
 
 	pEntity->GetBody(body)->SetMatrix(mtxTrans);
+}
+
+//-----------------------------------------------------------------------
+
+float __stdcall cLuxScriptHandler::GetBonePosX(string& asEntity, string& asBoneName) 
+{
+	iLuxEntity* pEntity = GetEntity(asEntity, eLuxEntityType_LastEnum, -1);
+	return pEntity->GetMeshEntity()->GetBoneStateFromName(asBoneName)->GetWorldPosition().x;
+}
+
+float __stdcall cLuxScriptHandler::GetBonePosY(string& asEntity, string& asBoneName)
+{
+	iLuxEntity* pEntity = GetEntity(asEntity, eLuxEntityType_LastEnum, -1);
+	return pEntity->GetMeshEntity()->GetBoneStateFromName(asBoneName)->GetWorldPosition().y;
+}
+
+float __stdcall cLuxScriptHandler::GetBonePosZ(string& asEntity, string& asBoneName)
+{
+	iLuxEntity* pEntity = GetEntity(asEntity, eLuxEntityType_LastEnum, -1);
+	return pEntity->GetMeshEntity()->GetBoneStateFromName(asBoneName)->GetWorldPosition().z;
+}
+
+//-----------------------------------------------------------------------
+
+float __stdcall cLuxScriptHandler::GetBoneRotX(string& asEntity, string& asBoneName) 
+{
+	iLuxEntity* pEntity = GetEntity(asEntity, eLuxEntityType_LastEnum, -1);
+	cVector3f fRot = cMath::MatrixToEulerAngles(pEntity->GetMeshEntity()->GetBoneStateFromName(asBoneName)->GetWorldMatrix().GetRotation(), eEulerRotationOrder_XYZ);
+	return fRot.x;
+}
+
+float __stdcall cLuxScriptHandler::GetBoneRotY(string& asEntity, string& asBoneName)
+{
+	iLuxEntity* pEntity = GetEntity(asEntity, eLuxEntityType_LastEnum, -1);
+	cVector3f fRot = cMath::MatrixToEulerAngles(pEntity->GetMeshEntity()->GetBoneStateFromName(asBoneName)->GetWorldMatrix().GetRotation(), eEulerRotationOrder_XYZ);
+	return fRot.y;
+}
+
+float __stdcall cLuxScriptHandler::GetBoneRotZ(string& asEntity, string& asBoneName)
+{
+	iLuxEntity* pEntity = GetEntity(asEntity, eLuxEntityType_LastEnum, -1);
+	cVector3f fRot = cMath::MatrixToEulerAngles(pEntity->GetMeshEntity()->GetBoneStateFromName(asBoneName)->GetWorldMatrix().GetRotation(), eEulerRotationOrder_XYZ);
+	return fRot.z;
+}
+
+//-----------------------------------------------------------------------
+
+float __stdcall cLuxScriptHandler::fLerp(float a, float b, float t) 
+{
+	//this may work, idk
+	return (a * (1.0 - t)) + (b * t);
 }
 
 //-----------------------------------------------------------------------
@@ -2808,6 +2907,21 @@ void __stdcall cLuxScriptHandler::AttachPropToProp(string& asPropName, string& a
 		pProp->AddAndAttachProp(asAttachName, asAttachFile, mtxTransform);
 
 	END_SET_PROPERTY
+}
+
+//-----------------------------------------------------------------------
+
+void __stdcall cLuxScriptHandler::AttachPlayerCameraToEntity(string& asPropName) 
+{
+	gpBase->mpPlayer->SetCamPosActive(true, asPropName);
+}
+
+//-----------------------------------------------------------------------
+
+void __stdcall cLuxScriptHandler::DetachPlayerCamera() 
+{
+	tString a = "";
+	gpBase->mpPlayer->SetCamPosActive(false, a);
 }
 
 //-----------------------------------------------------------------------

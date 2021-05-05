@@ -23,7 +23,7 @@
 #include "LuxPlayer.h"
 #include "LuxPlayerHands.h"
 #include "LuxMapHelper.h"
-#include "LuxHelpFuncs.h"
+#include "LuxPlayerHelpers.h"
 
 //////////////////////////////////////////////////////////////////////////
 // CONSTRUCTORS

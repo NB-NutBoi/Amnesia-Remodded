@@ -154,6 +154,7 @@ void iLuxHandObject::LoadSettings(cXmlElement *apVarsElem)
 	msLanternOnSound = apVarsElem->GetAttributeString("LanternOnSound", "ui_lantern_on");
 	msLanternOutOfOilSound = apVarsElem->GetAttributeString("LanternNoOilSound", "ui_lantern_off");
 
+	OilDrainSpeed = apVarsElem->GetAttributeFloat("LanternOilDrainSpeed", 0.23f);
 
 	/////////////////////////////
 	//Load implemented vars

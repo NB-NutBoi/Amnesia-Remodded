@@ -46,6 +46,7 @@
 #include "LuxMainMenu.h"
 
 
+
 //-----------------------------------------------------------------------
 
 //////////////////////////////////////////////////////////////////////////
@@ -1638,7 +1639,7 @@ cLuxPlayerLantern::cLuxPlayerLantern(cLuxPlayer *apPlayer) : iLuxPlayerHelper(ap
 	msGobo = gpBase->mpGameCfg->GetString("Player_Lantern","Gobo","");
 	mvLocalOffset = gpBase->mpGameCfg->GetVector3f("Player_Lantern","LocalOffset",0);
 	mbCastShadows = gpBase->mpGameCfg->GetBool("Player_Lantern","CastShadows",false);
-	mfLowerOilSpeed = gpBase->mpGameCfg->GetFloat("Player_Lantern","LowerOilSpeed",0);
+	//mfLowerOilSpeed = gpBase->mpGameCfg->GetFloat("Player_Lantern","LowerOilSpeed",0);
 	mfFadeLightOilAmount = gpBase->mpGameCfg->GetFloat("Player_Lantern","FadeLightOilAmount",0);
 
 	msDisabledSound = gpBase->mpGameCfg->GetString("Player_Lantern","DisabledSound","");
@@ -1667,6 +1668,7 @@ void cLuxPlayerLantern::Reset()
 
 //-----------------------------------------------------------------------
 
+float lastLanternRecorded;
 
 void cLuxPlayerLantern::Update(float afTimeStep)
 {
@@ -1699,6 +1701,9 @@ void cLuxPlayerLantern::Update(float afTimeStep)
 
 	////////////////////////////
 	// Lower oil
+	if (lastLanternRecorded != GetLantern()) { mfLowerOilSpeed = gpBase->mpPlayer->GetHands()->GetCurrentHandObject()->GetLanternOilDrainSpeed(); lastLanternRecorded = GetLantern(); }
+
+
 	if(mbActive && gpBase->mpEffectHandler->GetEmotionFlash()->IsActive()==false)
 	{
 		float fOil = mpPlayer->GetLampOil();
@@ -1820,6 +1825,7 @@ void cLuxPlayerLantern::SetActive(bool abX, bool abUseEffects, bool abCheckForOi
 	else {
 		msTurnOffSound = gpBase->mpPlayer->GetHands()->GetCurrentHandObject()->GetLanternOffSound();
 		msOutOfOilSound = gpBase->mpPlayer->GetHands()->GetCurrentHandObject()->GetLanternOutOfOilSound();
+
 		if (abUseEffects) gpBase->mpHelpFuncs->PlayGuiSoundData(msTurnOffSound, eSoundEntryType_Gui);
 		mpPlayer->GetHands()->SetActiveHandObject("");
 	}

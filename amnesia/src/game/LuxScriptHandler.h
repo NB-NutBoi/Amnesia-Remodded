@@ -239,6 +239,7 @@ private:
 	static void __stdcall SetLanternActive(bool abX, bool abUseEffects);
 	static void __stdcall SetLantern(int alLantern);
 	static int __stdcall GetLantern();
+	static bool __stdcall IsHardMode();
 	static void __stdcall SetArm(int alArm);
 	static int __stdcall GetArm();
 	static bool __stdcall GetLanternActive();
@@ -357,11 +358,21 @@ private:
 	static float __stdcall GetCameraRotationY();
 	static float __stdcall GetCameraRotationZ();
 
-	static float __stdcall GetEntityRotationX(string& asName);
-    static float __stdcall GetEntityRotationY(string& asName);
-	static float __stdcall GetEntityRotationZ(string& asName);
+	static float __stdcall GetEntityRotationX(string& asName, int body);
+    static float __stdcall GetEntityRotationY(string& asName, int body);
+	static float __stdcall GetEntityRotationZ(string& asName, int body);
 
 	static void __stdcall SetEntityRotation(string& asName, float afX, float afY, float afZ, int body);
+
+	static float __stdcall GetBonePosX(string& asEntity, string& asBoneName);
+	static float __stdcall GetBonePosY(string& asEntity, string& asBoneName);
+	static float __stdcall GetBonePosZ(string& asEntity, string& asBoneName);
+
+	static float __stdcall GetBoneRotX(string& asEntity, string& asBoneName);
+	static float __stdcall GetBoneRotY(string& asEntity, string& asBoneName);
+	static float __stdcall GetBoneRotZ(string& asEntity, string& asBoneName);
+
+	static float __stdcall fLerp(float a, float b, float t);
 
 	/**
 	* CrossHair can be: Default (uses default), Grab, Push, Ignite, Pick, LevelDoor, Ladder
@@ -403,6 +414,8 @@ private:
 	static void __stdcall StopPropMovement(string& asName);	
 	
 	static void __stdcall AttachPropToProp(string& asPropName, string& asAttachName, string& asAttachFile, float afPosX, float afPosY, float afPosZ, float afRotX, float afRotY, float afRotZ);
+	static void __stdcall AttachPlayerCameraToEntity(string& asPropName);
+	static void __stdcall DetachPlayerCamera();
 	static void __stdcall AddAttachedPropToProp(string& asPropName, string& asAttachName, string& asAttachFile, float afPosX, float afPosY, float afPosZ, float afRotX, float afRotY, float afRotZ);
 	static void __stdcall RemoveAttachedPropFromProp(string& asPropName, string& asAttachName);
 

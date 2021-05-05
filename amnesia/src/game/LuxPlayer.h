@@ -273,6 +273,10 @@ public:
 	void SetFreeCamSpeed(float afSpeed);
 	
 	////////////////////
+	// cam pos
+	void SetCamPosActive(bool abX, string& asPropName);
+
+	////////////////////
 	// Helpers
 	cLuxPlayerLightLevel *GetHelperLightLevel(){ return mpHelperLightLevel;}
 	cLuxPlayerInDarkness *GetHelperInDarkness(){ return mpHelperInDarkness;}
@@ -461,6 +465,11 @@ private:
 	// Free camera
 	bool mbFreeCameraActive;
 	float mfFreeCameraSpeed;
+
+	//////////////////////
+	// cam pos
+	bool mbCamPosActive;
+	tString msCamPosObject;
 };
 
 //----------------------------------------------

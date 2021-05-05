@@ -83,7 +83,7 @@ namespace hpl {
 
 		/////////////////////////////////////////
 		// Load file
-		int lLength = 0;
+		int lLength;
 		char *pCharBuffer = NULL;
 		
 		/////////////////////////////////////
@@ -118,7 +118,7 @@ namespace hpl {
 			}
 
 			textBuff.SetPos(0);
-			lLength = (int)textBuff.GetSize();
+			lLength = textBuff.GetSize();
 			pCharBuffer = hplNewArray(char,lLength);
 			textBuff.GetCharArray(pCharBuffer, lLength);
 		}
@@ -201,12 +201,31 @@ namespace hpl {
 
 	//-----------------------------------------------------------------------
 
-	bool cSqScript::Run(int alHandle)
+	bool cSqScript::RunFuncString(const tString &asFuncName, tString &asStringArg0)
 	{
+		int alHandle = mpModule->GetFunctionIdByName(asFuncName.c_str());
+		if (alHandle == asNO_FUNCTION) {
+			return false;
+		}
+
 		mpContext->Prepare(alHandle);
+		mpContext->SetArgObject(0, &asStringArg0);
+		mpContext->Execute();
 
-		/* Set all the args here */
+		return true;
+	}
 
+	//-----------------------------------------------------------------------
+
+	bool cSqScript::RunFuncFloat(const tString &asFuncName, float asFloatArg0)
+	{
+		int alHandle = mpModule->GetFunctionIdByName(asFuncName.c_str());
+		if (alHandle == asNO_FUNCTION) {
+			return false;
+		}
+
+		mpContext->Prepare(alHandle);
+		mpContext->SetArgFloat(0, asFloatArg0);
 		mpContext->Execute();
 
 		return true;

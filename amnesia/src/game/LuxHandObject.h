@@ -94,9 +94,11 @@ public:
 	const tString& GetAnimDraw(){ return msHandsAnim_Draw; }
 	const tString& GetAnimHolster(){ return msHandsAnim_Holster;}
 
-	tString GetLanternOnSound(){ return msLanternOnSound;}
-	tString GetLanternOffSound() { return msLanternOffSound; }
-	tString GetLanternOutOfOilSound() { return msLanternOutOfOilSound; }
+	const tString GetLanternOnSound(){ return msLanternOnSound;}
+	const tString GetLanternOffSound(){ return msLanternOffSound; }
+	const tString GetLanternOutOfOilSound(){ return msLanternOutOfOilSound; }
+
+	const float GetLanternOilDrainSpeed() { return OilDrainSpeed; }
 	
 protected:
 	virtual void LoadImplementedVars(cXmlElement *apVarsElem)=0;
@@ -135,6 +137,7 @@ protected:
 	std::vector<cBillboard*> mvBillboards;
 	std::vector<cParticleSystem*> mvParticleSystems;
 	std::vector<iLight*> mvLights;
+	float OilDrainSpeed;
 };
 
 //----------------------------------------------

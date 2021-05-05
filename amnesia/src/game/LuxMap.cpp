@@ -76,6 +76,7 @@ cLuxMap::cLuxMap(const tString& asName)
 	mpLatestAddedEntity = NULL;
 
 	mpScript = NULL;
+	mbRunUpdateScript = false;
 
 	msLanternLitCallback = "";
 
@@ -286,24 +287,7 @@ bool cLuxMap::LoadFromFile(const tString & asFile, bool abLoadEntities)
 			}
 		}
 
-#if 0
-		//////////////////////////
-		// Print what i've done
-		#if not MAC_OS && not LINUX
-		sDebugMsg += L" of ";
-		sDebugMsg += std::to_wstring(static_cast<long long>(lNumTotalTinderboxes));
-		sDebugMsg += L" tinderboxes removed, ";
-		sDebugMsg += std::to_wstring(static_cast<long double>(fTinderBoxRemoveEvery));
-		gpBase->mpDebugHandler->AddMessage(sDebugMsg, false);
 
-		sDebugMsg = std::to_wstring(static_cast<long long>(lNumRemovedOil));
-		sDebugMsg += L" of ";
-		sDebugMsg += std::to_wstring(static_cast<long long>(lNumTotalOil));
-		sDebugMsg += L" oil removed";
-
-		gpBase->mpDebugHandler->AddMessage(sDebugMsg, false);
-        #endif
-#endif
 
 		//////////////////////////
 		// Remove the entities from above
@@ -334,7 +318,7 @@ void cLuxMap::AfterWorldLoadEntitySetup()
 
 void cLuxMap::OnEnter(bool abRunScript, bool abFirstTime)
 {
-	RunUpdate = abRunScript;
+	mbRunUpdateScript = abRunScript;
 
 	///////////////
 	//On world load for all entities
@@ -399,13 +383,10 @@ void cLuxMap::Update(float afTimeStep)
 	UpdateToBeDesotroyedEntities(true);
 
 	UpdateLampLightConnections(afTimeStep);
-
-	if (RunUpdate)
+	
+	if (mbRunUpdateScript)
 	{
-		if (mpScript)
-		{
-			RunScript("Update(" + cString::ToString(afTimeStep) + ")");
-		}
+		RunUpdateCallback(afTimeStep);
 	}
 }
 
@@ -417,6 +398,20 @@ void cLuxMap::RunScript(const tString& asCommand)
 	if(this != gpBase->mpMapHandler->GetCurrentMap()) return;
 
     mpScript->Run(asCommand);
+}
+
+void cLuxMap::RunTimer(const tString& asTimerFunc, tString asTimerName) {
+	if(mpScript==NULL) return;
+	if(this != gpBase->mpMapHandler->GetCurrentMap()) return;
+
+	mpScript->RunFuncString(asTimerFunc, asTimerName);
+}
+
+void cLuxMap::RunUpdateCallback(float afTimeStep) {
+	if(mpScript==NULL) return;
+	if(this != gpBase->mpMapHandler->GetCurrentMap()) return;
+
+	mpScript->RunFuncFloat("OnUpdate", afTimeStep);
 }
 
 bool cLuxMap::RecompileScript(tString *apOutput)
@@ -1353,7 +1348,8 @@ void cLuxMap::UpdateTimers(float afTimeStep)
 
 		if(pTimer->mfCount <=0 && pTimer->mbDestroyMe==false)
 		{
-			RunScript(pTimer->msFunction+"(\""+pTimer->msName+"\")");
+			RunTimer(pTimer->msFunction, pTimer->msName);
+			
 			it = mlstTimers.erase(it);
 			hplDelete(pTimer);
 			
