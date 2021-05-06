@@ -3,9 +3,7 @@ A modified game executable using BUzzer's x64 fork that adds a bunch of new func
 
 Made by NutBoi & Nate with the help of the Frictional games discord community.
 
-Current version: 1.1 PREVIEW
-
-SOME THINGS WONT WORK OR AREN'T FULLY IMPLEMENTED!
+Current version: 1.1
 
 Also linux and mac are currently not supported to my knowledge, if you want to make a port for them, feel free to, the more people who can use this, the better.
 
