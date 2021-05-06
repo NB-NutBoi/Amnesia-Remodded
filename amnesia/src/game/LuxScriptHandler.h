@@ -363,6 +363,7 @@ private:
 	static float __stdcall GetEntityRotationZ(string& asName, int body);
 
 	static void __stdcall SetEntityRotation(string& asName, float afX, float afY, float afZ, int body);
+    static void __stdcall SetEntityRotationAndPosition(string& asName, float afrX, float afrY, float afrZ, float afpX, float afpY, float afpZ, int body);
 
 	static float __stdcall GetBonePosX(string& asEntity, string& asBoneName);
 	static float __stdcall GetBonePosY(string& asEntity, string& asBoneName);
@@ -371,6 +372,9 @@ private:
 	static float __stdcall GetBoneRotX(string& asEntity, string& asBoneName);
 	static float __stdcall GetBoneRotY(string& asEntity, string& asBoneName);
 	static float __stdcall GetBoneRotZ(string& asEntity, string& asBoneName);
+
+	static bool __stdcall CheckLineOfSight(string& asEntity1, string& asEntity2);
+	static bool __stdcall CheckIfEnemyDetectsPlayer(string& asEnemy);
 
 	static float __stdcall fLerp(float a, float b, float t);
 
