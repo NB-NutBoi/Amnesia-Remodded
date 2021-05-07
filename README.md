@@ -204,7 +204,7 @@ bool CheckEntityLineOfSight(string &in asEntity1, string &in asEntity1);
 2. *asEntity2* - entity 2
 
 ```as
-CheckIfEnemyDetectsPlayer(string &in asEnemy); is a bool, will return true if the enemy has detected the player.
+CheckIfEnemyDetectsPlayer(string &in asEnemy);
 ```
 1. *asEnemy* - enemy checked.
 
