@@ -551,6 +551,7 @@ void cLuxScriptHandler::InitScriptFunctions()
 
 	AddFunc("void ExitInventory()",(void *)ExitInventory);
 	AddFunc("void SetInventoryDisabled(bool abX)",(void *)SetInventoryDisabled);
+	AddFunc("void GetInventoryActive()",(void *)GetInventoryActive);
 	AddFunc("void SetInventoryMessage(string &in asTextCategory, string &in asTextEntry, float afTime)",(void *)SetInventoryMessage);
 	
 	AddFunc("void GiveItem(string &in asName, string &in asType, string &in asSubTypeName, string &in asImageName, float afAmount)",(void *)GiveItem);
@@ -1933,6 +1934,11 @@ void __stdcall cLuxScriptHandler::ExitInventory()
 void __stdcall cLuxScriptHandler::SetInventoryDisabled(bool abX)
 {
 	gpBase->mpInventory->SetDisabled(abX);
+}
+
+void __stdcall cLuxScriptHandler::GetInventoryActive()
+{
+	return gpBase->mpInventory->GetActive();
 }
 
 void __stdcall cLuxScriptHandler::SetInventoryMessage(string &asTextCategory, string &asTextEntry, float afTime)
