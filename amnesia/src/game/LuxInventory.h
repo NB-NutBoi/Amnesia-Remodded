@@ -232,6 +232,7 @@ public:
 	// Properties
 	void SetDisabled(bool abX){ mbDisabled = abX;}
 	bool GetDisabled(){ return mbDisabled;}
+	bool GetActive(){ return mbActive;}
 
 	void SetDescText(const tWString &asHeader, const tWString &asNormal);
 	/**
