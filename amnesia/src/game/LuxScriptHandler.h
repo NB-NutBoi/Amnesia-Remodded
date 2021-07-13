@@ -292,6 +292,7 @@ private:
 	// Inventory
 	static void __stdcall ExitInventory();
 	static void __stdcall SetInventoryDisabled(bool abX);
+	static void __stdcall GetInventoryActive();
 	/**
 	* if life time is <=0 then the life time is calculated based on string length.
 	*/
