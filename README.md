@@ -15,6 +15,7 @@ Also linux and mac are currently not supported to my knowledge, if you want to m
 - Fixed timer loop crash. (by zenmumbler)
 - Setting The rotation of entities.
 - Attaching the camera to entities on command.
+- Doubled shadow resolutions for spotlights.
 - Some other miscellaneous functions:
 	- Getting rotation of player camera/entities
 	- Getting position of specific bones (rotation is broken, don't know fully why)
