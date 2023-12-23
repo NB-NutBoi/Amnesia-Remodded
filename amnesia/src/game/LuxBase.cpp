@@ -106,6 +106,13 @@
 #define kCurrentVersion_Main 1
 #define kCurrentVersion_Minor 4
 
+#define kRemoddedVersion_Main 1
+#define kRemoddedVersion_Minor 2
+
+tString cLuxBase::GetRemoddedVersion() {
+	return to_string(kRemoddedVersion_Main)+"."+to_string(kRemoddedVersion_Minor);
+}
+
 //-----------------------------------------------------------------------
 
 extern tString gsSerialKey;
@@ -190,6 +197,9 @@ cLuxCustomStorySettings::cLuxCustomStorySettings(cLuxCustomStorySettings* apStor
 	msMapsFolder = apStory->msMapsFolder;
 	msStartMap = apStory->msStartMap;
 	msStartPos = apStory->msStartPos;
+
+	mbCsCompatibilityMode = apStory->mbCsCompatibilityMode;
+	msRemoddedVersion = apStory->msRemoddedVersion;
 }
 
 cLuxCustomStorySettings::~cLuxCustomStorySettings()
@@ -228,7 +238,20 @@ bool cLuxCustomStorySettings::CreateFromPath(const tWString& asPath)
 		msMapsFolder = cString::To8Char(msStoryRootFolder) + pCustomStoryCfg->GetString("Main", "MapsFolder", "maps");
 		msMapsFolder = cString::AddSlashAtEnd(msMapsFolder);
 
-		msStartMap = pCustomStoryCfg->GetString("Main", "StartMap", "");
+		msStartMap = pCustomStoryCfg->GetString("Main", "RemoddedStartMap", "");
+		mbCsCompatibilityMode = false;
+		if (msStartMap == "") {
+			msStartMap = pCustomStoryCfg->GetString("Main", "StartMap", "");
+			mbCsCompatibilityMode = true;
+			msRemoddedVersion = "0";
+		}
+		else {
+			msRemoddedVersion = pCustomStoryCfg->GetString("Main", "RemoddedVersion", "0");
+			if (msRemoddedVersion == "0") {
+				sErrorMsg = "Remodded custom story was not configured properly: 'RemoddedVersion' was not found";
+				bValid = false;
+			}
+		}
 		msStartPos = pCustomStoryCfg->GetString("Main", "StartPos", "");
 
 		tWString sStartMapPath = cString::To16Char(msMapsFolder) + cString::To16Char(msStartMap);
@@ -240,6 +263,8 @@ bool cLuxCustomStorySettings::CreateFromPath(const tWString& asPath)
 			bValid = false;
 		}
 
+		//fuck this
+		msName2 = pCustomStoryCfg->GetString("Main", "Name", "");
 		msName = cString::To16Char(pCustomStoryCfg->GetString("Main", "Name", ""));
 		if(msName==_W(""))
 			msName = kTranslate("CustomStory", "NoName");
@@ -417,7 +442,10 @@ bool cLuxBase::Init(const tString &asCommandline)
 	// Load the config files
 	if(InitMainConfig()==false) return false;
 
-	Log("Version %d.%d \n",kCurrentVersion_Main, kCurrentVersion_Minor);
+	Log("Engine Version %d.%d \n",kCurrentVersion_Main, kCurrentVersion_Minor);
+	Log("Remodded Version %s \n", GetRemoddedVersion());
+	Log("\n");
+	Log("USING REMODDED\n");
 	Log("\n");
 	
 	/////////////////////////////
@@ -586,7 +614,7 @@ bool cLuxBase::StartGame(const tString& asFile, const tString& asFolder, const t
 	//////////////////
 	//Load map
 	cLuxMap *pMap = mpMapHandler->LoadMap(sMapFile, true);
-	mpMapHandler->SetCurrentMap(pMap, true, true, sStartPos);
+	mpMapHandler->SetCurrentMap(pMap, true, true, false, sStartPos);
 	
 	///////////////////
 	//Send message that game has been started.
@@ -767,9 +795,74 @@ bool cLuxBase::InitApp()
 	mbAllowHardmode = pInitCfg->GetBool("Variables", "AllowHardMode", false);
 	
 	//Start map
-	msStartMapFile = pInitCfg->GetString("StartMap","File","");
-	msStartMapFolder = pInitCfg->GetString("StartMap","Folder","");
-	msStartMapPos = pInitCfg->GetString("StartMap","Pos","");
+	msStartMapFile = pInitCfg->GetString("RemoddedStartMap", "File", "");
+	msStartMapFolder = pInitCfg->GetString("RemoddedStartMap", "Folder", "");
+	msStartMapPos = pInitCfg->GetString("RemoddedStartMap", "Pos", "");
+
+	if (msStartMapFile == "" || msStartMapFolder == "" || msStartMapPos == "") {
+
+		mbCompatibilityMode = true;
+
+		msStartMapFile = pInitCfg->GetString("StartMap", "File", "");
+		msStartMapFolder = pInitCfg->GetString("StartMap", "Folder", "");
+		msStartMapPos = pInitCfg->GetString("StartMap", "Pos", "");
+
+		//FC was built for base game, do nothing fancy 
+
+		if (msStartMapFile == "" || msStartMapFolder == "" || msStartMapPos == "") {
+			FatalError("REMODDED-ERROR 001 - NO VALID CFG LOAD");
+		}
+	}
+
+	afRemoddedCompatibilityVersion = pInitCfg->GetFloat("Remodded", "Version", 0.0f);
+
+	if (afRemoddedCompatibilityVersion != std::stof(GetRemoddedVersion())) {
+		//you can tell from the ammount of comments i had tons of fun doing this one ;-;
+		if (mbCompatibilityMode == false) {
+			if (afRemoddedCompatibilityVersion == 0.0f) {
+				wstring a = pInitCfg->GetFileLocation();
+				Error("Could not find the remodded version this was built for on %s \n", a);
+				FatalError("REMODDED-ERROR 001 - NO VALID CFG LOAD");
+			}
+			else if (afRemoddedCompatibilityVersion < std::stof(GetRemoddedVersion())) {
+				//was built for previous version, should work fine but activate compatibility mode for now 
+				//(wich does nothing since this is the version that adds it and therefore should be the base version from now on)
+
+				//possible way i could do this is to add a switch statement to functions i modify from now on that had an older version
+				mbCompatibilityMode = true;
+				Warning("remodded version is specified as '%s' in the cfg, while the executable's version is marked as '%s' \n", GetRemoddedVersion(), to_string(afRemoddedCompatibilityVersion));
+				msGameName = msGameName + " OLDER VERSION COMPATIBILITY MODE";
+			}
+			else if (afRemoddedCompatibilityVersion > std::stof(GetRemoddedVersion())) {
+				//was built for future version, hi future! :)
+				Error("The mod you're trying to load was made for a future version!\n");
+				//Bye future!
+				FatalError("REMODDED-ERROR 002 - LOADED FUTURE VERSION");
+			}
+			else {
+				//uhh what
+				//unless i missed something this should never be the case
+				Error("Unknown error!\n");
+			}
+		}
+		if (mbCompatibilityMode == true) {
+			//compatibility mode was turned on?
+			if (afRemoddedCompatibilityVersion == 0) {
+				//ignore
+			}
+			else if (afRemoddedCompatibilityVersion > std::stof(GetRemoddedVersion())) {
+				//was built for future version, crash anyways
+				//i'm kinda lightheaded right now so i'm not sure this is right, cant focus on shit
+				//not like this code will get executed until i release (if) 1.3
+				Error("The mod you're trying to load was made for a future version!\n");
+				//Bye future!
+				FatalError("REMODDED-ERROR 002 - LOADED FUTURE VERSION");
+			}
+			else if (afRemoddedCompatibilityVersion < std::stof(GetRemoddedVersion())) {
+				//doesnt matter lol, again, this code shouldn't be executed if all goes right
+			}
+		}
+	}
 
 	//Delete the config file
 	hplDelete(pInitCfg);
@@ -1372,6 +1465,9 @@ bool cLuxBase::InitGame()
 	///////////////////////////////////////////////////////
 	// Run the LoadMainConfig message for game modules, couldn't be run before
 	RunModuleMessage(eLuxUpdateableMessage_LoadMainConfig);
+
+	float fFov = mpMainConfig->GetFloat("Graphics", "Fov", 70.0f);
+	mpPlayer->SetFov(cMath::ToRad(fFov));
 
 	return true;
 }

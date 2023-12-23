@@ -76,9 +76,9 @@ cLuxMap::cLuxMap(const tString& asName)
 	mpLatestAddedEntity = NULL;
 
 	mpScript = NULL;
-	mbRunUpdateScript = false;
 
 	msLanternLitCallback = "";
+	msLanternToggleCallback = "";
 
 	mlNumberOfQuests = 0;
 	mlTotalCompletionAmount = 0;
@@ -316,10 +316,8 @@ void cLuxMap::AfterWorldLoadEntitySetup()
 
 //-----------------------------------------------------------------------
 
-void cLuxMap::OnEnter(bool abRunScript, bool abFirstTime)
+void cLuxMap::OnEnter(bool abRunScript, bool abFirstTime, bool abLoaded)
 {
-	mbRunUpdateScript = abRunScript;
-
 	///////////////
 	//On world load for all entities
 	tLuxEntityListIt entityIt = mlstEntities.begin();
@@ -344,6 +342,9 @@ void cLuxMap::OnEnter(bool abRunScript, bool abFirstTime)
 
 			mpScript->Run("OnEnter()");
 		}
+	}
+	else if (abLoaded && mpScript) {
+		mpScript->Run("OnLoad()");
 	}
 	
 }
@@ -384,7 +385,7 @@ void cLuxMap::Update(float afTimeStep)
 
 	UpdateLampLightConnections(afTimeStep);
 	
-	if (mbRunUpdateScript)
+	if (mpScript)
 	{
 		RunUpdateCallback(afTimeStep);
 	}

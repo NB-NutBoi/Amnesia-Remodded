@@ -237,6 +237,7 @@ private:
 	static void __stdcall SetPlayerCrouchDisabled(bool abX);
 	static void __stdcall TeleportPlayer(string &asStartPosName);
 	static void __stdcall SetLanternActive(bool abX, bool abUseEffects);
+	static void __stdcall SetLanternActiveWithCallback(bool abX, bool abUseEffects, string& asCallback);
 	static void __stdcall SetLantern(int alLantern);
 	static int __stdcall GetLantern();
 	static bool __stdcall IsHardMode();
@@ -244,6 +245,7 @@ private:
 	static int __stdcall GetArm();
 	static bool __stdcall GetLanternActive();
 	static void __stdcall SetLanternDisabled(bool abX);
+	static void __stdcall SetLanternDisabledEx(bool abX, bool abForceInactive);
 	static void __stdcall SetPlayerFallDamageDisabled(bool abX);
 	/**
 	 * Syntax: MyFun(bool abLit)
@@ -299,6 +301,10 @@ private:
 	
 	static void __stdcall GiveItem(string& asName, string& asType, string& asSubTypeName, string& asImageName, float afAmount);
 	static void __stdcall RemoveItem(string& asName);
+	static void __stdcall RemoveTinderboxes(int ammount);
+	static int __stdcall GetTinderboxes();
+	static void __stdcall RemoveItemStack(string& asName, int ammount);
+	static void __stdcall GiveItemStack(string& asName, string& asType, string& asSubTypeName, string& asImageName, float afAmmount, int alCount);
 	static bool __stdcall HasItem(string& asName);
 
 	//This is meant to be used for debug mostly as it creates the actual item and then destroys i.

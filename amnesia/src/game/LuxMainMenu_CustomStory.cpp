@@ -218,7 +218,20 @@ void cLuxMainMenu_CustomStory::SetCurrentStory(cLuxCustomStorySettings* apStory)
         cWidgetButton* pButton = mvButtons[i];
 
 		// If button is not affected by the presence of save files or there are save files, the button will be active
-		bool bButtonActive = (vButtonAffectedBySave[i]==false || bSaveFileExists);
+		bool bButtonActive = false;
+
+		if (apStory->mbCsCompatibilityMode) {
+			bButtonActive = (vButtonAffectedBySave[i] == false || bSaveFileExists);
+		}
+		else {
+			if (std::stof(gpBase->GetRemoddedVersion()) >= std::stof(apStory->msRemoddedVersion)) {
+				bButtonActive = (vButtonAffectedBySave[i] == false || bSaveFileExists);
+			}
+			else {
+				//only cancel button visible.
+				bButtonActive = i == 3;
+			}
+		}
 
 		pButton->SetEnabled(bButtonActive);
 		pButton->SetVisible(bButtonActive);
@@ -425,7 +438,17 @@ void cLuxMainMenu_CustomStoryList::PopulateStoryList()
 
 		if(pStory->CreateFromPath(sStoryPath))
 		{
+			tString req = "";
+			if (pStory->mbCsCompatibilityMode) {
+				//really cheap ik but i dont care lol
+				req = "                                                                                            |     (Standard game)";
+			}
+			else {
+				req = "                                                                                            |     (Remodded " + pStory->msRemoddedVersion +")";
+			}
+
 			cWidgetItem* pItem = mpLBStories->AddItem(pStory->msName);
+			pItem->SetDescText(cString::To16Char(req));
 			pItem->SetUserData(pStory);
 		}
 		else

@@ -83,7 +83,7 @@ public:
 	
 	void AfterWorldLoadEntitySetup();
 	
-	void OnEnter(bool abRunScript, bool abFirstTime);
+	void OnEnter(bool abRunScript, bool abFirstTime, bool abLoaded);
 	void OnLeave(bool abRunScript);
 	
 	void Update(float afTimeStep);
@@ -190,6 +190,11 @@ public:
 	void SetLanternLitCallback(const tString& asCallback){ msLanternLitCallback = asCallback;}
 	const tString& GetLanternLitCallback(){ return msLanternLitCallback;}
 	
+	void SetLanternToggleCallback(const tString& asCallback) { msLanternToggleCallback = asCallback; }
+	const tString& GetLanternToggleCallback() { return msLanternToggleCallback; }
+
+	void SetSanityDeathEnabled(const bool abX) { mbSanityDeathEnabled = abX; }
+	bool GetSanityDeathEnabled() { return mbSanityDeathEnabled; }
 	
 private:
 	void CalculateTotalCompletionAmount();
@@ -218,12 +223,15 @@ private:
 	iScript *mpScript;
 
 	tString msLanternLitCallback;
+	tString msLanternToggleCallback;
 
 	int mlNumberOfQuests;
 	int mlTotalCompletionAmount;
 	int mlCurrentCompletionAmount;
 
 	bool mbCommentaryIconsActive;
+
+	bool mbSanityDeathEnabled;
 
 	tString msCheckPointName;
 	tString msCheckPointStartPos;
@@ -256,8 +264,6 @@ private:
 	tLuxDissolveEntityList mlstDissolveEntities;
 
 	tLuxLampLightConnectionList mlstLampLightConnections;
-	
-	bool mbRunUpdateScript;
 };
 
 //----------------------------------------------

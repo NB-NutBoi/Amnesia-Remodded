@@ -1538,6 +1538,16 @@ void cEditorWindowMaterialEditor::OnInitLayout()
 	mpMenuExit = pItem->AddMenuItem(_W("Exit"));
 	mpMenuExit->AddCallback(eGuiMessage_ButtonPressed, this, kGuiCallback(MenuCallback));
 
+	mpMenuExit->AddShortcut(0, eKey_Escape);
+
+#if defined(WIN32)
+	mpMenuExit->AddShortcut(eKeyModifier_Alt, eKey_F4);
+#elif defined(__linux__)
+	mpMenuExit->AddShortcut(eKeyModifier_Ctrl, eKey_Q);
+#elif defined(__APPLE__)
+	mpMenuExit->AddShortcut(eKeyModifier_Ctrl, eKey_Q);
+#endif
+
 
 	float fStartY = pMenu->GetLocalPosition().y+pMenu->GetSize().y+5;
 

@@ -55,6 +55,9 @@ namespace hpl {
 		virtual bool isQuitMessagePosted()=0;
         virtual void resetQuitMessagePosted()=0;
 
+		virtual bool isResizeMessagePosted() = 0;
+		virtual void resetResizeMessagePosted() = 0;
+
 		/**
 		 * 
 		 */

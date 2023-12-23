@@ -96,6 +96,7 @@ namespace hpl {
 		iFrameBufferAttachment* GetStencilBuffer(){ return mpStencilBuffer;}
 
 		inline const cVector2l& GetSize(){ return mvSize;}
+		inline void SetSize(const cVector2l& mvNewSize) { mvSize = mvNewSize; }
 
 	protected:
 		iLowLevelGraphics* mpLowLevelGraphics;

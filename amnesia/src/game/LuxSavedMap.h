@@ -47,6 +47,7 @@ public:
 	tString msDisplayNameEntry;
 
 	tString msLanternLitCallback;
+	tString msLanternToggleCallback;
 
 	int mlNumberOfQuests;
 	int mlTotalCompletionAmount;

@@ -1229,7 +1229,7 @@ void cLuxPlayer_SaveData::ToPlayer(cLuxMap *apMap,cLuxPlayer *apPlayer)
 	apPlayer->GetHelperLantern()->SetLantern(alLantern);
 
 	apPlayer->GetHelperLantern()->SetActive(mbLanternOn, false, false);
-	apPlayer->GetHelperLantern()->SetDisabled(mbLanternDisabled);
+	apPlayer->GetHelperLantern()->SetDisabled(mbLanternDisabled, true);
 
 	apPlayer->GetHelperDeath()->SetHint(msDeathHintCat, msDeathHintEntry);
 

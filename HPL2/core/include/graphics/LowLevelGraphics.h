@@ -72,6 +72,10 @@ namespace hpl {
 
         virtual void SetWindowCaption(const tString& asName)=0;
 
+		virtual void SetWindowResizable(const bool &abX)=0;
+
+		virtual void ResizeWindow()=0;
+
         virtual bool GetWindowMouseFocus()=0;
 
         virtual bool GetWindowInputFocus()=0;

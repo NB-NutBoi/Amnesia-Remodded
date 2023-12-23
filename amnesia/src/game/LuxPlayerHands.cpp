@@ -162,6 +162,8 @@ void cLuxPlayerHands::Update(float afTimeStep)
 	{
 		cAnimationState *pAnim = mpHandsEntity->GetAnimationState(i);
 	}
+
+	
 	
 	////////////////////////////
 	// Disabled
@@ -175,12 +177,12 @@ void cLuxPlayerHands::Update(float afTimeStep)
 	{
 		if(AnimOver())
 		{
+			cLuxMap* pMap = gpBase->mpMapHandler->GetCurrentMap();
+
 			////////////////////
 			//Draw up new object
 			if(mpCurrentHandObject)
 			{
-				cLuxMap *pMap = gpBase->mpMapHandler->GetCurrentMap();
-
 				CreateAndAttachHandObject(pMap, mpCurrentHandObject);
 				PlayAnim(mpCurrentHandObject->GetAnimDraw(),false);
 				
@@ -194,6 +196,14 @@ void cLuxPlayerHands::Update(float afTimeStep)
 				mpHandsEntity->SetVisible(false);
 				mHandState = eLuxHandsState_Disabled;
 			}
+
+			if (pMap->GetLanternToggleCallback() != "") 
+			{
+				pMap->RunScript(pMap->GetLanternToggleCallback() + "(false)");
+				pMap->SetLanternToggleCallback("");
+
+				gpBase->mpPlayer->GetHelperLantern()->SetCanSwitch(true);
+			}
 		}
 	}	
 	////////////////////////////
@@ -204,6 +214,15 @@ void cLuxPlayerHands::Update(float afTimeStep)
 		{
 			PlayAnim(mpCurrentHandObject->GetAnimIdle(),true);
 			mHandState = eLuxHandsState_Idle;
+
+			cLuxMap* pMap = gpBase->mpMapHandler->GetCurrentMap();
+			if (pMap->GetLanternToggleCallback()!="")
+			{
+				pMap->RunScript(pMap->GetLanternToggleCallback() + "(true)");
+				pMap->SetLanternToggleCallback("");
+
+				gpBase->mpPlayer->GetHelperLantern()->SetCanSwitch(true);
+			}
 		}
 
 	}		
@@ -400,6 +419,8 @@ void cLuxPlayerHands::SetCurrentHandObject(iLuxHandObject *apObject)
 
 	cLuxMap *pMap = gpBase->mpMapHandler->GetCurrentMap();
 
+	if (pMap->GetLanternToggleCallback() != "") gpBase->mpPlayer->GetHelperLantern()->SetCanSwitch(false);
+
 	ResetHandObjectVars();
 	
 	////////////////////////
@@ -436,8 +457,6 @@ void cLuxPlayerHands::SetState(eLuxHandsState aState)
 
 void cLuxPlayerHands::SetHands(int alH) 
 {
-	alHands = alH;
-
 	if (mpPlayer->GetHelperLantern()->IsActive()) 
 	{
 		Error("Could not set hands object becouse the lantern is out!");
@@ -445,6 +464,8 @@ void cLuxPlayerHands::SetHands(int alH)
 	}
 	else 
 	{
+		alHands = alH;
+
 		DestroyWorldEntities(gpBase->mpMapHandler->GetCurrentMap());
 		if(mpCurrentHandObject == NULL){ CreateWorldEntities(gpBase->mpMapHandler->GetCurrentMap());}
 	}

@@ -144,11 +144,18 @@ namespace hpl {
                 }
             } else
 #endif
-            if (sdlEvent.type==SDL_QUIT)
-            {
-                mbQuitMessagePosted = true;
-            } else
-				mlstEvents.push_back(sdlEvent);
+				if (sdlEvent.type == SDL_WINDOWEVENT) {
+					if (sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED) {
+						//RESIZE??
+						mpLowLevelGraphics->ResizeWindow(); //Make sure the game fits the window.
+						mbResizeMessagePosted = true;
+					}
+				}
+				else if (sdlEvent.type==SDL_QUIT)
+				{
+					mbQuitMessagePosted = true;
+				} else
+					mlstEvents.push_back(sdlEvent);
 		}
 	}
 	
@@ -223,4 +230,13 @@ namespace hpl {
 
 	//-----------------------------------------------------------------------
     
+	bool cLowLevelInputSDL::isResizeMessagePosted()
+	{
+		return mbResizeMessagePosted;
+	}
+
+	void cLowLevelInputSDL::resetResizeMessagePosted()
+	{
+		mbResizeMessagePosted = false;
+	}
 }

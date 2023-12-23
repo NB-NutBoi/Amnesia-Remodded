@@ -1343,7 +1343,7 @@ void cLuxDebugHandler::TestChangeMapSave()
 
 	pMap = gpBase->mpMapHandler->LoadMap(sMapFile,true);
 	
-	gpBase->mpMapHandler->SetCurrentMap(pMap, false, false, "");
+	gpBase->mpMapHandler->SetCurrentMap(pMap, false, false, true, "");
 	
 	pSavedMaps->LoadMap(pMap);
 

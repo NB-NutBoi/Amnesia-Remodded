@@ -100,11 +100,15 @@ cLuxPlayer::cLuxPlayer() : iLuxUpdateable("LuxPlayer"), iLuxCollideCallbackConta
 	//////////////////////////////////
 	// Init body properties
 	mvBodySize = gpBase->mpGameCfg->GetVector3f("Player_Body","Size",0);
-	mvBodyCrouchSize = gpBase->mpGameCfg->GetVector3f("Player_Body","CrouchSize",0);
-	
+	mvBodyCrouchSize = gpBase->mpGameCfg->GetVector3f("Player_Body","CrouchSize",0);	
 	mvCameraPosAdd = gpBase->mpGameCfg->GetVector3f("Player_Body","CameraPosAdd",0);
 
 	mfDefaultMass = gpBase->mpGameCfg->GetFloat("Player_Body","Mass",0);
+
+	//////////////////////////////////
+	// Proning
+	mbProneEnabled = gpBase->mpGameCfg->GetBool("Player_Body", "ProneEnabled", false);
+	mvBodyProneSize = gpBase->mpGameCfg->GetVector3f("Player_Body", "ProneSize", 0);
 
 
 	//////////////////////////////////
@@ -1259,16 +1263,9 @@ void cLuxPlayer::UpdateCamera(float afTimeStep)
 
 	////////////////
 	// FOV
-	if(mfFOVMul != mfFOVMulGoal)
-	{
-		float fSpeed = (mfFOVMulGoal - mfFOVMul) * mfFOVMulSpeed;
-		mfFOVMul += afTimeStep * fSpeed;
-		
-		if(cMath::Abs(mfFOVMulGoal - mfFOVMul) < 0.004f) 
-			mfFOVMul = mfFOVMulGoal;
 
-		mpCamera->SetFOV(mfFOV*mfFOVMul);
-	}
+	//separate function for changeable fov
+	UpdateCameraFov(afTimeStep);
 
 	////////////////
 	// Aspect
@@ -1334,6 +1331,7 @@ void cLuxPlayer::UpdateCamera(float afTimeStep)
 	}
 	else
 	{
+		//THIS IS BASICALLY TO ATTACH THE CAMERA TO ANY ENTITY (DOES NOT STOP PLAYER MOVEMENT AND MESSES WITH THE PLAYER DIRECTION WHEN DONE)
 		cLuxMap* pMap = gpBase->mpMapHandler->GetCurrentMap();
 		if (pMap == NULL)
 		{
@@ -1351,6 +1349,24 @@ void cLuxPlayer::UpdateCamera(float afTimeStep)
 		mpCamera->SetMatrix(pEntity->GetBody(0)->GetLocalMatrix());
 	}
 
+}
+
+void cLuxPlayer::UpdateCameraFov(float afTimeStep) {
+	if (mfFOVMul != mfFOVMulGoal)
+	{
+		float fSpeed = (mfFOVMulGoal - mfFOVMul) * mfFOVMulSpeed;
+		mfFOVMul += afTimeStep * fSpeed;
+
+		if (cMath::Abs(mfFOVMulGoal - mfFOVMul) < 0.004f)
+			mfFOVMul = mfFOVMulGoal;
+
+		mpCamera->SetFOV(mfFOV * mfFOVMul);
+	}
+}
+
+void cLuxPlayer::SetFov(float fov) {
+	mfFOV = fov;
+	mpCamera->SetFOV(mfFOV * mfFOVMul);
 }
 
 //-----------------------------------------------------------------------

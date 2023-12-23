@@ -424,14 +424,14 @@ void cLuxMapHandler::DestroyMap(cLuxMap* apMap, bool abLoadingSaveGame)
 {
 	////////////////////////////////
 	//If the map do me destroyed is current, make sure it is not current
-	if(mpCurrentMap == apMap) SetCurrentMap(NULL, abLoadingSaveGame, false,"");
+	if(mpCurrentMap == apMap) SetCurrentMap(NULL, abLoadingSaveGame, false, false,"");
 
     STLFindAndDelete(mlstMaps,apMap);
 }
 
 //-----------------------------------------------------------------------
 
-void cLuxMapHandler::SetCurrentMap(cLuxMap* apMap, bool abRunScript, bool abFirstTime, const tString& asPlayerPos)
+void cLuxMapHandler::SetCurrentMap(cLuxMap* apMap, bool abRunScript, bool abFirstTime, bool abIsLoading, const tString& asPlayerPos)
 {
 	if(mpCurrentMap == apMap) return;
 
@@ -463,7 +463,7 @@ void cLuxMapHandler::SetCurrentMap(cLuxMap* apMap, bool abRunScript, bool abFirs
 		mpCurrentMap->SetCheckPoint("_auto", asPlayerPos, "");
 		
 		//Map enter callback
-		mpCurrentMap->OnEnter(abRunScript, abFirstTime);
+		mpCurrentMap->OnEnter(abRunScript, abFirstTime, abIsLoading);
 
 		//Set this as world in viewport
 		mpViewport->SetWorld(mpCurrentMap->GetWorld());
@@ -670,7 +670,7 @@ void cLuxMapHandler::CheckMapChange(float afTimeStep)
 		// Set new and destroy old
 		bool bFirstTime = mpSavedGame->MapExists(sNewMapName)==false;	
 		
-		SetCurrentMap(pMap, false, bFirstTime, mMapChangeData.msStartPos);
+		SetCurrentMap(pMap, false, bFirstTime, false, mMapChangeData.msStartPos);
 		DestroyMap(pLastMap, false);
 
 		//////////////////////

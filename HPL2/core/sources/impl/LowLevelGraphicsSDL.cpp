@@ -234,7 +234,7 @@ namespace hpl {
 		if(mpScreen==NULL)
         {
             // try disabling FSAA
-			Error("Could not set display mode setting a lower one! %s\n", SDL_GetError());
+			Error("Could not set display mode, setting a lower one! %s\n", SDL_GetError());
 			mvScreenSize = cVector2l(640,480);
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
             SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
@@ -667,6 +667,24 @@ namespace hpl {
         SDL_WM_SetCaption(asName.c_str(), "");
 #endif
     }
+
+	void cLowLevelGraphicsSDL::SetWindowResizable(const bool& abX) {
+#if SDL_VERSION_ATLEAST(2, 0, 0)
+		SDL_SetWindowResizable(mpScreen, abX ? SDL_TRUE : SDL_FALSE);
+#else
+		//IDK the code for this one?
+#endif
+	}
+
+	void cLowLevelGraphicsSDL::ResizeWindow() {
+		int w, h;
+		SDL_GetWindowSize(mpScreen, &w, &h);
+		mvScreenSize = cVector2l(w, h);
+
+		mvScissorSize = mvScreenSize;
+		mvFrameBufferSize = mvScreenSize;
+		mvFrameBufferTotalSize = mvScreenSize;
+	}
 
     bool cLowLevelGraphicsSDL::GetWindowMouseFocus()
     {

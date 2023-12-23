@@ -128,6 +128,7 @@ private:
 
 	bool mbRunning;
 	bool mbCrouching;
+	bool mbProning;
 
 	bool mbJumping;
 	float mfJumpStartForce;

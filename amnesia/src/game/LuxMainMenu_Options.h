@@ -72,6 +72,7 @@ private:
 	void ApplyChanges();
 
 	float GetGamma() { return GetSliderValue(mpSGamma, mfGammaMin, mfGammaMax); }
+	float GetFov() { return GetSliderValue(mpSFov, mfFovMin, mfFovMax); }
 	float GetSensitivity() { return GetSliderValue(mpSMouseSensitivity, mfMouseSensitivityMin, mfMouseSensitivityMax); }
 #ifdef USE_GAMEPAD
 	float GetGamepadLookSensitivity() { return GetSliderValue(mpSGamepadLookSensitivity, mfGamepadLookSensitivityMin, mfGamepadLookSensitivityMax); }
@@ -79,6 +80,7 @@ private:
 	float GetVolume() { return GetSliderValue(mpSVolume, mfVolumeMin, mfVolumeMax); }
 
 	void SetGammaLabelString(float afX);
+	void SetFovLabelString(float afX);
 	void SetSensitivityLabelString(float afX);
 	void SetGamepadLookSensitivityLabelString(float afX);
 	void SetVolumeLabelString(float afX);
@@ -185,6 +187,9 @@ private:
 	cWidgetLabel	*mpLGamma;
 	cWidgetSlider	*mpSGamma;
 
+	cWidgetLabel* mpLFov;
+	cWidgetSlider* mpSFov;
+
 	iWidget* mpLastFocusedWidget;
 	bool mbHideWindow;
 
@@ -213,6 +218,10 @@ private:
 	float mfGammaMin;
 	float mfGammaMax;
 	float mfGammaStep;
+
+	float mfFovMin;
+	float mfFovMax;
+	float mfFovStep;
 
 	float mfMouseSensitivityMin;
 	float mfMouseSensitivityMax;
@@ -265,6 +274,9 @@ private:
 
 	bool GammaSlider_OnMove(iWidget* apWidget, const cGuiMessageData& aData);
 	kGuiCallbackDeclarationEnd(GammaSlider_OnMove);
+
+	bool FovSlider_OnMove(iWidget* apWidget, const cGuiMessageData& aData);
+	kGuiCallbackDeclarationEnd(FovSlider_OnMove);
 
 	bool MouseSensitivitySlider_OnMove(iWidget* apWidget, const cGuiMessageData& aData);
 	kGuiCallbackDeclarationEnd(MouseSensitivitySlider_OnMove);

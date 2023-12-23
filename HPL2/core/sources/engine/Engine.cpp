@@ -463,6 +463,13 @@ namespace hpl {
                         mpInput->resetQuitMessagePosted();
                     }
 
+					if (mpInput->isResizeMessagePosted()) {
+
+						mpUpdater->RunMessage(eUpdateableMessage_WindowResized);
+
+						mpInput->resetResizeMessagePosted();
+					}
+
 					/////////////////////////////////////////////
 					// Run Check if any application focus changed
 					CheckAndBroadcastFocusChange();

@@ -189,6 +189,7 @@ public:
 	int GetTinderboxes(){ return mlTinderboxes;}
 	void SetTinderboxes(int alX){ mlTinderboxes = alX; }
 	void AddTinderboxes(int alX){ mlTinderboxes += alX; }
+	void RemoveTinderboxes(int alX) { mlTinderboxes -= alX; if (mlTinderboxes < 0) { mlTinderboxes = 0; } }
 	
 	bool IsDead(){ return mfHealth <=0;}
 
@@ -297,6 +298,9 @@ public:
 
 	float GetRoll(){ return mfRoll;}
 	float GetLeanRoll(){ return mfLeanRoll;}
+
+	float GetFov() { return mfFOV; }
+	void SetFov(float fov);
 	
 private:
 	bool CanDrawCrossHair();
@@ -304,6 +308,7 @@ private:
 
 	void UpdateHeadPosAdd(float afTimeStep);
 	void UpdateCamera(float afTimeStep);
+	void UpdateCameraFov(float afTimeStep);
 	void UpdateTerror(float afTimeStep);
 	void UpdateLean(float afTimeStep);
 	void UpdateFocusText(float afTimeStep);
@@ -416,7 +421,10 @@ private:
 	// Data
 	cVector3f mvBodySize;
 	cVector3f mvBodyCrouchSize;
+	cVector3f mvBodyProneSize;
 	cVector3f mvCameraPosAdd;
+
+	bool mbProneEnabled;
 
 	float mfHeadSpinDamageSpeed;
 	float mfHeadSpinDeacc;

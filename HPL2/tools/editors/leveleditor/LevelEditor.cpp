@@ -68,6 +68,7 @@ using namespace hpl;
 #include "LevelEditorActions.h"
 
 #include <algorithm>
+#include <SDL2/SDL_events.h>
 
 
 unsigned int cLevelEditorGroup::mlGroupCounter = 1;
@@ -565,6 +566,10 @@ void cLevelEditor::OnInitLayout()
 	////////////////////////////////////
 	// Search Window
 	mpWindowSearch = cEditorWindowFactory::CreateSearchWindow(this, (cEditorEditModeSelect*)GetEditMode("Select"));
+
+	///////////////////////////////////
+	// Window resize here?
+	mpEngine->GetGraphics()->GetLowLevel()->SetWindowResizable(true);
 }
 
 //--------------------------------------------------------------------
@@ -685,7 +690,7 @@ void cLevelEditor::OnLoadConfig()
 	}
 
 	// Window caption
-	msCaption = "HPL Level Editor";
+	msCaption = "HPL2 Level Editor";
 	
 	SetLogFile(GetHomeDir() + _W("LevelEditor.log"));
 
@@ -792,6 +797,96 @@ void cLevelEditor::OnSaveConfig()
 
 //--------------------------------------------------------------------
 
+void cLevelEditor::OnResizeGame() {
+	Log("Changed Editor Window Size. V2\n");
+
+	cGuiSetListIterator it = mpViewport->GetGuiSetIterator();
+	while (it.HasNext())
+	{
+		cGuiSet* pSet = it.Next();
+		
+		pSet->SetVirtualSize(mpEngine->GetGraphics()->GetLowLevel()->GetScreenSizeFloat(), -1000, 1000, cVector2f(0));
+	}
+
+	mvScreenSize = mpSet->GetVirtualSize();
+
+	mpBGFrame->SetSize(mvScreenSize);
+
+	mpMainMenu->SetSize(cVector2f(mvScreenSize.x, mpMainMenu->GetSize().y));
+	
+	/////////////////////////////////////////////
+
+	SetUpWindowAreas();
+
+	/////////////////////////////////
+	//Apply layout changes
+
+	mpEditModeSidebar->SetPosition(cVector3f(0, mpMainMenu->GetSize().y + 2, 1));
+
+	mpLowerToolbar->SetSize(cVector2f(GetLayoutVec2f(eLayoutVec2_ViewportAreaSize).x - 4, 50));
+	mpLowerToolbar->SetPosition(cVector3f(GetLayoutVec3f(eLayoutVec3_ViewportAreaPos).x, mvScreenSize.y - 50, 1));
+
+	/////////////////////////////////////////////
+	// Reposition 4 viewports
+
+	// Set up viewport positions (on screen)
+	const cVector2f& vLargeVPSize = GetLayoutVec2f(eLayoutVec2_ViewportAreaSize);
+	cVector2f vSmallVPSize = vLargeVPSize * 0.5f;
+
+	const cVector3f& vViewportAreaPosition = GetLayoutVec3f(eLayoutVec3_ViewportAreaPos);
+	tVector3fVec vViewportPos;
+	vViewportPos.push_back(vViewportAreaPosition);
+	vViewportPos.push_back(vViewportAreaPosition + cVector2f(vSmallVPSize.x, 0));
+	vViewportPos.push_back(vViewportAreaPosition + cVector2f(0, vSmallVPSize.y));
+	vViewportPos.push_back(vViewportAreaPosition + vSmallVPSize);
+
+	// Set up viewport positions (on framebuffer)
+	cVector2l vFBPos[4];
+	vFBPos[0] = cVector2l(0);
+	vFBPos[1] = cVector2l((int)vSmallVPSize.x, 0);
+	vFBPos[2] = cVector2l(0, (int)vSmallVPSize.y);
+	vFBPos[3] = cVector2l((int)vSmallVPSize.x, (int)vSmallVPSize.y);
+	
+	for (int i = 0; i < 4; ++i)
+	{
+		cEditorWindowViewport* pViewport = mvViewports[i];
+
+		bool isEnlarged = pViewport->IsEnlarged(); //Get this before resize.
+		bool isEnabled = pViewport->IsEnabled();
+		bool isVisible = pViewport->IsVisible();
+
+		pViewport->GetFrameBuffer()->SetSize(cVector2l(-1, -1)); //reset frameBuffer size.
+		pViewport->GetEngineViewport()->SetFrameBuffer(pViewport->GetFrameBuffer());
+
+		pViewport->SetNormalPosition(vViewportPos[i]);
+		pViewport->SetEnlargedPosition(vViewportPos[0]);
+		pViewport->SetNormalSize(vSmallVPSize - 4);
+		pViewport->SetEnlargedSize(vLargeVPSize);
+		pViewport->SetEngineViewportNormalPosition(vFBPos[i]);
+		pViewport->SetEngineViewportNormalSize(cVector2l((int)vSmallVPSize.x, (int)vSmallVPSize.y));
+
+		pViewport->UpdateViewport();
+
+		if(isVisible && isEnabled)
+			pViewport->SetEnlarged(isEnlarged); //Updates size for me lol
+	}
+
+	//mpViewport->GetFrameBuffer()->SetSize(cVector2l((int)mvScreenSize.x, (int)mvScreenSize.y));
+
+	cVector3f vEditWindowPos = GetLayoutVec3f(eLayoutVec3_ViewportAreaPos) + cVector3f(GetLayoutVec2f(eLayoutVec2_ViewportAreaSize).x, -2, 0);
+	for (int i = 0; i < (int)mvEditModes.size(); ++i)
+	{
+		if (mvEditModes[i]->GetEditorWindow() != NULL)
+			mvEditModes[i]->GetEditorWindow()->SetPosition(vEditWindowPos);
+	}
+
+	SetLayoutNeedsUpdate(true);
+}
+
+void cLevelEditor::OnQuit() {
+	Command_Exit();
+}
+
 cWidgetMainMenu* cLevelEditor::CreateMainMenu()
 {
 	/////////////////////////////////
@@ -843,9 +938,9 @@ cWidgetMainMenu* cLevelEditor::CreateMainMenu()
 	// Quit
 	mpMainMenuExit = pItem->AddMenuItem(_W("Quit"));
 	mpMainMenuExit->AddCallback(eGuiMessage_ButtonPressed, this, kGuiCallback(MainMenu_ItemClick));
-#if defined(_WIN32)
-	mpMainMenuExit->AddShortcut(eKeyModifier_Alt, eKey_F4);
-#elif defined(__linux__)
+//#if defined(_WIN32) NO LONGER NEEDED, SDL TAKES CARE OF THIS ONE.
+	//mpMainMenuExit->AddShortcut(eKeyModifier_Alt, eKey_F4);
+#if defined(__linux__)
 	mpMainMenuExit->AddShortcut(eKeyModifier_Ctrl, eKey_Q);
 #elif defined(__APPLE__)
 	mpMainMenuExit->AddShortcut(eKeyModifier_Ctrl, eKey_Q);

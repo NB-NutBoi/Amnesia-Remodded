@@ -206,6 +206,8 @@ public:
 								const tString& asSubTypeName, const tString& asImageName,
 								float afAmount, const tString & asVal,const tString& asExtraVal,
 								bool* apRemoveItemProp=NULL);
+	void RemoveItemStack(const tString& asName, const int alAmmount);
+	void AddItemStack(const tString& asName, eLuxItemType aType, const tString& asSubTypeName, const tString& asImageName, float afAmmount, int alCount, const tString& asVal, const tString& asExtraVal);
 	void RemoveItem(const tString& asName);
 	void RemoveItem(cLuxInventory_Item *apItem);
 	void RemoveItemOfType(eLuxItemType aType);

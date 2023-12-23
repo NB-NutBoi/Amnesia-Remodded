@@ -253,6 +253,8 @@ namespace hpl {
 		void DrawDefaultText(	const tWString& asText,
 								const cVector3f& avPosition,eFontAlign aAlign);
 
+		void DrawDescriptionText(const tWString& asText, const cVector3f& avPosition, eFontAlign aAlign);
+
 		void DrawDefaultText(	const tWString& asText,
 								const cVector3f& avPosition,eFontAlign aAlign, const cColor& aCol);
 

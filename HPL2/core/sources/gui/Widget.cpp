@@ -787,6 +787,15 @@ namespace hpl {
 						mDefaultFontColor*mColorMul, aAlign);
 	}
 
+	void iWidget::DrawDescriptionText(const tWString& asText,
+		const cVector3f& avPosition, eFontAlign aAlign)
+	{
+		if (mpDefaultFontType == NULL) return;
+
+		mpSet->DrawFont(asText, mpDefaultFontType, avPosition, mvDefaultFontSize,
+			mDefaultFontColor * mColorMul, aAlign);
+	}
+
 	//-----------------------------------------------------------------------
 
 	void iWidget::DrawDefaultText(	const tWString& asText,

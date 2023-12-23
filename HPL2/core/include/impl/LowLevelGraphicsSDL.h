@@ -121,6 +121,10 @@ namespace hpl {
 
         void SetWindowCaption(const tString &asName);
 
+		void SetWindowResizable(const bool &abX);
+
+		void ResizeWindow();
+
         bool GetWindowMouseFocus();
         
         bool GetWindowInputFocus();
@@ -312,6 +316,7 @@ namespace hpl {
 #ifdef WITH_CG
 		CGcontext GetGC_Context(){ return mCG_Context;}
 #endif
+		
 		void SetupGL();
 
 	private:

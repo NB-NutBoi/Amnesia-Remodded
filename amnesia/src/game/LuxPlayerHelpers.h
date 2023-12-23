@@ -400,11 +400,14 @@ public:
 	void SetActive(bool abX, bool abUseEffects, bool abCheckForOilAndItems=true, bool abCheckIfAllowed=true);
 	bool IsActive(){ return mbActive;}
 
-	void SetDisabled(bool abX);
+	void SetDisabled(bool abX, bool abForceInactive);
 	bool GetDisabled(){ return mbDisabled;}
 
 	void SetLantern(int alL);
 	int GetLantern() { return alLantern;}
+
+	void SetCanSwitch(bool abB) { mbCanSwitch = abB; }
+	bool GetCanSwitch() { return mbCanSwitch; }
 
 	iLight* GetLight(){ return mpLight;}
 
@@ -418,9 +421,11 @@ private:
 	tString msTurnOffSound;
 	tString msOutOfOilSound;
 	tString msDisabledSound;
+	int lastLanternRecorded;
 	float mfLowerOilSpeed;
 	float mfFadeLightOilAmount;
 	bool mbDisabled;
+	bool mbCanSwitch;
 	int alLantern;
 	bool mbActive;
 	float mfAlpha;

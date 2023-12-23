@@ -1639,10 +1639,15 @@ cLuxPlayerLantern::cLuxPlayerLantern(cLuxPlayer *apPlayer) : iLuxPlayerHelper(ap
 	msGobo = gpBase->mpGameCfg->GetString("Player_Lantern","Gobo","");
 	mvLocalOffset = gpBase->mpGameCfg->GetVector3f("Player_Lantern","LocalOffset",0);
 	mbCastShadows = gpBase->mpGameCfg->GetBool("Player_Lantern","CastShadows",false);
-	//mfLowerOilSpeed = gpBase->mpGameCfg->GetFloat("Player_Lantern","LowerOilSpeed",0);
+	mfLowerOilSpeed = gpBase->mpGameCfg->GetFloat("Player_Lantern","LowerOilSpeed",0);
 	mfFadeLightOilAmount = gpBase->mpGameCfg->GetFloat("Player_Lantern","FadeLightOilAmount",0);
 
 	msDisabledSound = gpBase->mpGameCfg->GetString("Player_Lantern","DisabledSound","");
+
+	lastLanternRecorded = -1;
+	msTurnOnSound = "";
+	msTurnOffSound = "";
+	msOutOfOilSound = "";
 
 	Reset();
 }
@@ -1662,13 +1667,12 @@ void cLuxPlayerLantern::Reset()
 {
 	mbDisabled = false;
 	mbActive = false;
+	mbCanSwitch = true;
 	mpLight = NULL;
 	mfAlpha =0;
 }
 
 //-----------------------------------------------------------------------
-
-float lastLanternRecorded;
 
 void cLuxPlayerLantern::Update(float afTimeStep)
 {
@@ -1701,8 +1705,10 @@ void cLuxPlayerLantern::Update(float afTimeStep)
 
 	////////////////////////////
 	// Lower oil
-	if (lastLanternRecorded != GetLantern()) { mfLowerOilSpeed = gpBase->mpPlayer->GetHands()->GetCurrentHandObject()->GetLanternOilDrainSpeed(); lastLanternRecorded = GetLantern(); }
-
+	if (lastLanternRecorded != GetLantern()) { 
+		mfLowerOilSpeed = gpBase->mpPlayer->GetHands()->GetCurrentHandObject()->GetLanternOilDrainSpeed(); 
+		lastLanternRecorded = GetLantern();
+	}
 
 	if(mbActive && gpBase->mpEffectHandler->GetEmotionFlash()->IsActive()==false)
 	{
@@ -1774,7 +1780,18 @@ void cLuxPlayerLantern::DestroyWorldEntities(cLuxMap *apMap)
 
 void cLuxPlayerLantern::SetActive(bool abX, bool abUseEffects, bool abCheckForOilAndItems, bool abCheckIfAllowed)
 {
-	if(mbActive == abX) return;
+	if (!mbCanSwitch) return;
+
+	if (mbActive == abX) {
+
+		cLuxMap* pMap = gpBase->mpMapHandler->GetCurrentMap();
+		if (pMap->GetLanternToggleCallback() != "")
+		{
+			pMap->RunScript(pMap->GetLanternToggleCallback() + "(" + (abX ? "true" : "false") + ")");
+			pMap->SetLanternToggleCallback("");
+		}
+		return;
+	}
 
 	/////////////////
 	// Check so allowed
@@ -1818,9 +1835,16 @@ void cLuxPlayerLantern::SetActive(bool abX, bool abUseEffects, bool abCheckForOi
 	/////////////////
 	// Hand
 	if (mbActive) {
-		mpPlayer->GetHands()->SetActiveHandObject("lantern" + to_string(alLantern));
-		msTurnOnSound = gpBase->mpPlayer->GetHands()->GetCurrentHandObject()->GetLanternOnSound();
-		if (abUseEffects) gpBase->mpHelpFuncs->PlayGuiSoundData(msTurnOnSound, eSoundEntryType_Gui);
+		if (gpBase->mbCompatibilityMode && gpBase->afRemoddedCompatibilityVersion == 0.0f) {
+			mpPlayer->GetHands()->SetActiveHandObject("lantern");
+			msTurnOnSound = gpBase->mpPlayer->GetHands()->GetCurrentHandObject()->GetLanternOnSound();
+			if (abUseEffects) gpBase->mpHelpFuncs->PlayGuiSoundData(msTurnOnSound, eSoundEntryType_Gui);
+		}
+		else {
+			mpPlayer->GetHands()->SetActiveHandObject("lantern" + to_string(alLantern));
+			msTurnOnSound = gpBase->mpPlayer->GetHands()->GetCurrentHandObject()->GetLanternOnSound();
+			if (abUseEffects) gpBase->mpHelpFuncs->PlayGuiSoundData(msTurnOnSound, eSoundEntryType_Gui);
+		}
 	}
 	else {
 		msTurnOffSound = gpBase->mpPlayer->GetHands()->GetCurrentHandObject()->GetLanternOffSound();
@@ -1842,11 +1866,11 @@ void cLuxPlayerLantern::SetActive(bool abX, bool abUseEffects, bool abCheckForOi
 
 //-----------------------------------------------------------------------
 
-void cLuxPlayerLantern::SetDisabled(bool abX)
+void cLuxPlayerLantern::SetDisabled(bool abX, bool abForceInactive)
 {
 	mbDisabled = abX;
 
-	if(mbDisabled)
+	if(mbDisabled && abForceInactive)
 		SetActive(false, true);
 }
 
@@ -1854,11 +1878,13 @@ void cLuxPlayerLantern::SetDisabled(bool abX)
 
 void cLuxPlayerLantern::SetLantern(int alL) 
 {
-	alLantern = alL;
-
 	if (IsActive()) 
 	{
-		Error("Could not set lantern immediately due to it being on, waiting for lantern to get turned off...");
+		Error("CANNOT CHANGE LANTERN WHEN IT IS ON!");
+	}
+	else 
+	{
+		alLantern = alL;
 	}
 }
 

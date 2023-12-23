@@ -1064,6 +1064,7 @@ cLuxInventory_Item * cLuxInventory::AddItem(const tString& asName, eLuxItemType 
 
 		pVar->msVal = cString::ToString(intVal);
 
+		//lol
 		if (intVal >= 150)
 		{
 			gpBase->mpAchievementHandler->UnlockAchievement(eLuxAchievement_Illuminatus);
@@ -1149,6 +1150,66 @@ cLuxInventory_Item * cLuxInventory::AddItem(const tString& asName, eLuxItemType 
 	if(apRemoveItemProp) *apRemoveItemProp = true;
 	mvItems.push_back(pItem);  
 	return pItem;
+}
+
+//REMODDED.
+//-----------------------------------------------------------------------
+
+void cLuxInventory::RemoveItemStack(const tString& asName, const int alAmmount)
+{
+	std::vector<cLuxInventory_Item*>::iterator it = mvItems.begin();
+	for (; it != mvItems.end(); ++it)
+	{
+		cLuxInventory_Item* apItem = *it;
+		if (apItem->GetName() == asName)
+		{
+
+			iLuxItemType* pType = mvItemTypes[apItem->GetType()];
+
+			if (pType->HasCount())
+			{
+				apItem->AddCount(-alAmmount);
+				if (apItem->GetCount() > 0) return;
+			}
+			else {
+				Warning("'%s' is not a stackable item!\n", asName.c_str());
+				return;
+			}
+
+			if (mpPickedItem == apItem) mpPickedItem = NULL;
+			if (mpEquippedItem == apItem) mpEquippedItem = NULL;
+
+			std::vector<cLuxInventory_Item*>::iterator it = mvItems.begin();
+
+			for (; it != mvItems.end(); ++it)
+			{
+				cLuxInventory_Item* pItem = *it;
+				if (apItem == pItem)
+				{
+					hplDelete(pItem);
+					mvItems.erase(it);
+					return;
+				}
+			}
+			return;
+		}
+
+	}
+	Warning("Item '%s' could not be found when trying to remove it!\n", asName.c_str());
+}
+
+void cLuxInventory::AddItemStack(const tString& asName, eLuxItemType aType,
+	const tString& asSubTypeName, const tString& asImageName,
+	float afAmmount, int alCount, const tString& asVal, const tString& asExtraVal)
+{
+	//Warning("adding '%s' items!\n", cString::ToString(alCount));
+	iLuxItemType* pItemType = mvItemTypes[aType];
+	if (pItemType->HasCount()) {
+		AddItem(asName, aType, asSubTypeName, asImageName, afAmmount, asVal, asExtraVal)->SetCount(alCount);
+	}
+	else {
+		Warning("Item type is not stackable!\n");
+	}
 }
 
 //-----------------------------------------------------------------------

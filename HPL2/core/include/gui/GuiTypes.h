@@ -392,6 +392,10 @@ namespace hpl {
 		eGuiSkinGfx_FilePickerIconOther,
 		eGuiSkinGfx_FilePickerIconFolder,
 
+		///////////////////////////////////////
+		// New Stuff - Stolen from hpl chad gang fork.
+		eGuiSkinGfx_FrameBackgroundColorPicking,
+
 
 		eGuiSkinGfx_LastEnum,
 	};

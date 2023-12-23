@@ -68,6 +68,7 @@ void cLuxSavedMap::FromMap(cLuxMap *apMap)
 	msDisplayNameEntry = apMap->GetDisplayNameEntry();
 
 	msLanternLitCallback = apMap->msLanternLitCallback;
+	msLanternToggleCallback = apMap->msLanternToggleCallback;
 
 	mlNumberOfQuests = apMap->mlNumberOfQuests;
 	mlTotalCompletionAmount = apMap->mlTotalCompletionAmount;
@@ -228,6 +229,7 @@ void cLuxSavedMap::ToMap(cLuxMap *apMap)
 	apMap->SetDisplayNameEntry(msDisplayNameEntry);
 
 	apMap->msLanternLitCallback = msLanternLitCallback;
+	apMap->msLanternToggleCallback = msLanternToggleCallback;
 
 	apMap->mlNumberOfQuests = mlNumberOfQuests;
 	apMap->mlTotalCompletionAmount = mlTotalCompletionAmount;
@@ -452,6 +454,7 @@ kSerializeVar(msFileName, eSerializeType_String)
 kSerializeVar(msDisplayNameEntry, eSerializeType_String)
 
 kSerializeVar(msLanternLitCallback, eSerializeType_String)
+kSerializeVar(msLanternToggleCallback, eSerializeType_String)
 
 kSerializeVar(mlNumberOfQuests, eSerializeType_Int32)
 kSerializeVar(mlTotalCompletionAmount, eSerializeType_Int32)

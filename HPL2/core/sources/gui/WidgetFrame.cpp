@@ -96,6 +96,11 @@ namespace hpl {
 	// PUBLIC METHODS
 	//////////////////////////////////////////////////////////////////////////
 
+	void cWidgetFrame::ChangeBackgroundForColorPicking()
+	{
+		mpGfxBackground = mpSkin->GetGfx(eGuiSkinGfx_FrameBackgroundColorPicking);
+	}
+
 	//-----------------------------------------------------------------------
 
 	void cWidgetFrame::OnAttachChild(iWidget* apChild)

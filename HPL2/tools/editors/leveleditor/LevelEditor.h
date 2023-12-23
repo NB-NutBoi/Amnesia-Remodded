@@ -168,6 +168,10 @@ protected:
 
 	void OnPostUpdateLayout();
 
+	void OnResizeGame();
+
+	void OnQuit();
+
 	void OnInit();
 	void OnInitInput();
 	void OnInitLayout();

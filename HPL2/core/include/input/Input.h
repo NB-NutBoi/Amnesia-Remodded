@@ -164,6 +164,9 @@ namespace hpl {
         bool isQuitMessagePosted();
         void resetQuitMessagePosted();
 
+		bool isResizeMessagePosted();
+		void resetResizeMessagePosted();
+
 		iLowLevelInput* GetLowLevel(){ return mpLowLevelInput;}
 
 		void AppDeviceWasPlugged();

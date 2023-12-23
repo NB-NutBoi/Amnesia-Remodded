@@ -74,7 +74,7 @@ namespace hpl {
 		mpCont = apCont;
 		mbSelectable = true;
 		mbSelected = false;
-
+		mbHasDesc = false;
 		mpUserData = NULL;
 	}
 
@@ -138,6 +138,12 @@ namespace hpl {
 	void cWidgetItem::SetText(const tWString& asText)
 	{
 		msText = asText;
+	}
+
+	void cWidgetItem::SetDescText(const tWString& asText)
+	{
+		mbHasDesc = true;
+		msDescText = asText;
 	}
 
 	//------------------------------------------------------------------------

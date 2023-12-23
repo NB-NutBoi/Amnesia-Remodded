@@ -37,6 +37,8 @@ namespace hpl {
 
 		virtual void OnDraw(float afFrameTime){}
 		virtual void OnPostRender(float afFrameTime){}
+
+		virtual void OnResizeGame() {}
 		
 		virtual void PreUpdate(float afTimeStep){}
 		virtual void Update(float afTimeStep){}
@@ -108,6 +110,9 @@ namespace hpl {
 					AppDeviceWasPlugged();break;
 				case eUpdateableMessage_AppDeviceWasRemoved:
 					AppDeviceWasRemoved();break;
+
+				case eUpdateableMessage_WindowResized:
+					OnResizeGame();break;
 			};
 		}
 		

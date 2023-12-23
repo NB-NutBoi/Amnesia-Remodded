@@ -415,4 +415,14 @@ namespace hpl
 
     //-----------------------------------------------------------------------
 
+	bool cInput::isResizeMessagePosted()
+	{
+		return mpLowLevelInput->isResizeMessagePosted();
+	}
+
+	void cInput::resetResizeMessagePosted()
+	{
+		mpLowLevelInput->resetResizeMessagePosted();
+	}
+
 }

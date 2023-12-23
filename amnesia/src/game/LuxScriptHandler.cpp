@@ -517,13 +517,16 @@ void cLuxScriptHandler::InitScriptFunctions()
 
 	AddFunc("void TeleportPlayer(string &in asStartPosName)",(void *)TeleportPlayer);
 	AddFunc("void SetLanternActive(bool abX, bool abUseEffects)",(void *)SetLanternActive);
+	AddFunc("void SetLanternActiveWithCallback(bool abX, bool abUseEffects, string &in asCallback)",(void *)SetLanternActiveWithCallback);
 	AddFunc("bool GetLanternActive()",(void *)GetLanternActive);
 	AddFunc("void SetLanternDisabled(bool abX)",(void *)SetLanternDisabled);
+	AddFunc("void SetLanternDisabledEx(bool abX, bool abForceInactive)",(void *)SetLanternDisabledEx);
 	AddFunc("void SetLanternLitCallback(string &in asCallback)",(void *)SetLanternLitCallback);
 	AddFunc("void SetMessage(string &in asTextCategory, string &in asTextEntry, float afTime)",(void *)SetMessage);
 	AddFunc("void SetDeathHint(string &in asTextCategory, string &in asTextEntry)",(void *)SetDeathHint);
 	AddFunc("void DisableDeathStartSound()",(void *)DisableDeathStartSound);
 
+	// REMODDED 1.1 LANTERN FUNCS
 	AddFunc("void SetLantern(int alLantern)",(void *)SetLantern);
 	AddFunc("int GetLantern()",(void *)GetLantern);
 	AddFunc("bool IsHardMode()",(void *)IsHardMode);
@@ -640,6 +643,15 @@ void cLuxScriptHandler::InitScriptFunctions()
 
 	AddFunc("void AttachPlayerCameraToEntity(string &in asProp)",(void *)AttachPlayerCameraToEntity);
 	AddFunc("void DetachPlayerCamera()",(void *)DetachPlayerCamera);
+
+	//INVENTORY-----------------------------
+
+	AddFunc("void RemoveTinderboxes(int ammount)",(void *)RemoveTinderboxes);
+	AddFunc("int GetTinderboxes()",(void *)GetTinderboxes);
+	AddFunc("void RemoveItemStack(string &in asName, int ammount)",(void *)RemoveItemStack);
+	AddFunc("void GiveItemStack(string &in asName, string &in asType, string &in asSubTypeName, string &in asImageName, float afAmmount, int alCount)", (void*)GiveItemStack);
+
+	//---------------------------------------
 
 	AddFunc("void SetLampLit(string &in asName, bool abLit, bool abEffects)",(void *)SetLampLit); 
 	AddFunc("void SetSwingDoorLocked(string &in asName, bool abLocked, bool abEffects)",(void *)SetSwingDoorLocked);
@@ -1706,6 +1718,16 @@ void __stdcall cLuxScriptHandler::SetLanternActive(bool abX, bool abUseEffects)
 
 //-----------------------------------------------------------------------
 
+void __stdcall cLuxScriptHandler::SetLanternActiveWithCallback(bool abX, bool abUseEffects, string &asCallback)
+{
+	cLuxMap* pMap = gpBase->mpMapHandler->GetCurrentMap();
+	pMap->SetLanternToggleCallback(asCallback);
+
+	gpBase->mpPlayer->GetHelperLantern()->SetActive(abX, abUseEffects);
+}
+
+//-----------------------------------------------------------------------
+
 void __stdcall cLuxScriptHandler::SetLantern(int alLantern)
 {
 	gpBase->mpPlayer->GetHelperLantern()->SetLantern(alLantern);
@@ -1750,7 +1772,14 @@ bool __stdcall cLuxScriptHandler::GetLanternActive()
 
 void __stdcall cLuxScriptHandler::SetLanternDisabled(bool abX)
 {
-	gpBase->mpPlayer->GetHelperLantern()->SetDisabled(abX);
+	gpBase->mpPlayer->GetHelperLantern()->SetDisabled(abX, true);
+}
+
+//-----------------------------------------------------------------------
+
+void __stdcall cLuxScriptHandler::SetLanternDisabledEx(bool abX, bool abForceInactive)
+{
+	gpBase->mpPlayer->GetHelperLantern()->SetDisabled(abX, abForceInactive);
 }
 
 //-----------------------------------------------------------------------
@@ -1980,6 +2009,28 @@ void __stdcall cLuxScriptHandler::RemoveItem(string& asName)
 {
 	gpBase->mpInventory->RemoveItem(asName);
 }
+
+//-----------------------------------------------------------------------
+
+void __stdcall cLuxScriptHandler::RemoveTinderboxes(int ammount) {
+	gpBase->mpPlayer->RemoveTinderboxes(ammount);
+}
+
+int __stdcall cLuxScriptHandler::GetTinderboxes() {
+	return gpBase->mpPlayer->GetTinderboxes();
+}
+
+void __stdcall cLuxScriptHandler::RemoveItemStack(string& asName,int ammount) {
+	gpBase->mpInventory->RemoveItemStack(asName, ammount);
+}
+
+void __stdcall cLuxScriptHandler::GiveItemStack(string& asName, string& asType, string& asSubTypeName, string& asImageName, float afAmmount, int alCount)
+{
+	eLuxItemType type = gpBase->mpInventory->GetItemTypeFromString(asType);
+	gpBase->mpInventory->AddItemStack(asName, type, asSubTypeName, asImageName, afAmmount, alCount, "", "");
+}
+
+//-----------------------------------------------------------------------
 
 bool __stdcall cLuxScriptHandler::HasItem(string& asName)
 {
@@ -2654,7 +2705,7 @@ float __stdcall cLuxScriptHandler::GetBoneRotX(string& asEntity, string& asBoneN
 		Error("Could not get rotation of bone '%s' because it doesn't exist!\n", asBoneName.c_str());
 		return 0;
 	}
-	cVector3f fRot = cMath::MatrixToEulerAngles(bone->GetWorldMatrix().GetRotation(), eEulerRotationOrder_XYZ);
+	cVector3f fRot = cMath::MatrixToEulerAngles(bone->GetWorldMatrix().GetRotation(), eEulerRotationOrder_ZXY);
 	return fRot.x;
 }
 
@@ -2670,7 +2721,7 @@ float __stdcall cLuxScriptHandler::GetBoneRotY(string& asEntity, string& asBoneN
 		Error("Could not get rotation of bone '%s' because it doesn't exist!\n", asBoneName.c_str());
 		return 0;
 	}
-	cVector3f fRot = cMath::MatrixToEulerAngles(bone->GetWorldMatrix().GetRotation(), eEulerRotationOrder_XYZ);
+	cVector3f fRot = cMath::MatrixToEulerAngles(bone->GetWorldMatrix().GetRotation(), eEulerRotationOrder_ZXY);
 	return fRot.y;
 }
 
@@ -2686,15 +2737,38 @@ float __stdcall cLuxScriptHandler::GetBoneRotZ(string& asEntity, string& asBoneN
 		Error("Could not get rotation of bone '%s' because it doesn't exist!\n", asBoneName.c_str());
 		return 0;
 	}
-	cVector3f fRot = cMath::MatrixToEulerAngles(bone->GetWorldMatrix().GetRotation(), eEulerRotationOrder_XYZ);
+	cVector3f fRot = cMath::MatrixToEulerAngles(bone->GetWorldMatrix().GetRotation(), eEulerRotationOrder_ZXY);
 	return fRot.z;
 }
 
 bool __stdcall cLuxScriptHandler::CheckLineOfSight(string& asEntity1, string& asEntity2)
 {
+	if (asEntity1 == "Player")
+	{
+		iLuxEntity* pEntity2 = GetEntity(asEntity2, eLuxEntityType_LastEnum, -1);
+		if (pEntity2 == NULL) {
+			Error("Could not check line of sight in between player and '%s' because '%s' doesn't exist or is not a valid entity!\n", asEntity2);
+			return false;
+		}
+		return gpBase->mpMapHelper->CheckLineOfSight(gpBase->mpPlayer->GetCharacterBody()->GetPosition(), pEntity2->GetBody(0)->GetWorldPosition(), false);
+	}
+
+	if (asEntity2 == "Player")
+	{
+		iLuxEntity* pEntity1 = GetEntity(asEntity1, eLuxEntityType_LastEnum, -1);
+		if (pEntity1 == NULL) {
+			Error("Could not check line of sight in between player and '%s' because '%s' doesn't exist or is not a valid entity!\n", asEntity1);
+			return false;
+		}
+		return gpBase->mpMapHelper->CheckLineOfSight(gpBase->mpPlayer->GetCharacterBody()->GetPosition(), pEntity1->GetBody(0)->GetWorldPosition(), false);
+	}
+
 	iLuxEntity* pEntity1 = GetEntity(asEntity1, eLuxEntityType_LastEnum, -1);
 	iLuxEntity* pEntity2 = GetEntity(asEntity2, eLuxEntityType_LastEnum, -1);
-	if (pEntity1 == NULL || pEntity2 == NULL) { return false; }
+	if (pEntity1 == NULL || pEntity2 == NULL) { 
+		Error("Could not check line of sight in between '%s' and '%s' because one of them doesn't exist or is not a valid entity!\n", asEntity1, asEntity2);
+		return false; 
+	}
 	return gpBase->mpMapHelper->CheckLineOfSight(pEntity1->GetBody(0)->GetWorldPosition(), pEntity2->GetBody(0)->GetWorldPosition(), false);
 }
 

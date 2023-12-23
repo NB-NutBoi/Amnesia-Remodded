@@ -425,7 +425,7 @@ void cLuxSaveHandler::LoadSaveGameData(cLuxSaveGame_SaveData *apSave)
 	
 		// Destroy old and set new
 		if(pCurrentMap) gpBase->mpMapHandler->DestroyMap(pCurrentMap, false);
-		gpBase->mpMapHandler->SetCurrentMap(pNewMap, false, false,"");
+		gpBase->mpMapHandler->SetCurrentMap(pNewMap, false, false, true,"");
 
 		pCurrentMap = pNewMap;
 

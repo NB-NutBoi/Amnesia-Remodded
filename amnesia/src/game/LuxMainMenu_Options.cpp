@@ -112,6 +112,10 @@ cLuxMainMenu_Options::cLuxMainMenu_Options(cGuiSet *apGuiSet, cGuiSkin *apGuiSki
 	mfGammaStep = 0.05f;
 	mfGammaMax = 2.0f;
 
+	mfFovMin = 60.0f;
+	mfFovStep = 1.0f;
+	mfFovMax = 120.0f;
+
 	mfMouseSensitivityMin = 0.2f;
 	mfMouseSensitivityStep = 0.1f;
 	mfMouseSensitivityMax = 5.0f;
@@ -538,6 +542,33 @@ void cLuxMainMenu_Options::AddBasicGfxOptions(cWidgetDummy* apDummy)
 		//pLInstr->SetDefaultFontSize(12);
 	}
 
+	/////////////////////////////////
+	// FOV | thanks Florian.#1121 for the gui code
+	vPos.x += 240;
+
+	tWString fovName = kTranslate("OptionsMenu", "FieldOfView");
+	if (fovName.empty()) {
+		fovName = cString::To16Char("FOV");
+	}
+
+	pLabel = mpGuiSet->CreateWidgetLabel(vPos, -1, fovName, apDummy);
+	{
+		cVector3f vLabelPos(0, pLabel->GetSize().y + 5, 0);
+
+		tWString fovTip = kTranslate("OptionsMenu", "FieldOfViewTip");
+		if (fovTip.empty()) {
+			fovTip = cString::To16Char("Field of view. WARNING: GOING HIGHER THAN 70 IS NOT RECOMMENDED");
+		}
+
+		mpSFov = mpGuiSet->CreateWidgetSlider(eWidgetSliderOrientation_Horizontal, cVector3f(0, pLabel->GetSize().y + 5, 0), cVector2f(150, 20), 0, pLabel);
+		SetUpInput(pLabel, mpSFov, false, fovTip);
+
+		SetUpSlider(mpSFov, mfFovMin, mfFovMax, mfFovStep, kGuiCallback(FovSlider_OnMove), &mpLFov);
+		mpSFov->SetBarValueSize(7);
+
+		vPos.y += mpSFov->GetLocalPosition().y + mpSFov->GetSize().y + 15;
+	}
+
 	mpCBResolution->SetFocusNavigation(eUIArrow_Down, mpCBTextureSizeLevel);
 	mpCBResolution->SetFocusNavigation(eUIArrow_Right, mpChBFullScreen);
 
@@ -555,9 +586,10 @@ void cLuxMainMenu_Options::AddBasicGfxOptions(cWidgetDummy* apDummy)
 
 	mpCBTextureSizeLevel->SetFocusNavigation(eUIArrow_Up, mpCBResolution);
 	mpCBTextureSizeLevel->SetFocusNavigation(eUIArrow_Down, mpSGamma);
+	mpCBTextureSizeLevel->SetFocusNavigation(eUIArrow_Down, mpSFov);
 
 	mpSGamma->SetFocusNavigation(eUIArrow_Up, mpCBTextureSizeLevel);
-	
+	mpSFov->SetFocusNavigation(eUIArrow_Left, mpSGamma);
 }
 
 //-----------------------------------------------------------------------
@@ -1292,6 +1324,11 @@ void cLuxMainMenu_Options::SetInputValues(cResourceVarsObject& aObj)
 		float fGamma = aObj.GetVarFloat("Gamma");
 		SetSliderValue(mpSGamma, fGamma, false, mfGammaMin, mfGammaMax);
 		SetGammaLabelString(fGamma);
+
+		//FOV
+		float fFov = aObj.GetVarFloat("FOV");
+		SetSliderValue(mpSFov, fFov, false, mfFovMin, mfFovMax);
+		SetFovLabelString(fFov);
 	}
 #endif
 	////////////////////////////////
@@ -1441,6 +1478,7 @@ void cLuxMainMenu_Options::ApplyChanges()
 //		pCfgHdr->mbAdaptiveVSync = mpChBAdaptiveVSync->IsChecked();
 		pGfx->GetLowLevel()->SetVsyncActive(pCfgHdr->mbVSync, pCfgHdr->mbAdaptiveVSync);
 		pGfx->GetLowLevel()->SetGammaCorrection(GetGamma());
+		gpBase->mpPlayer->SetFov(cMath::ToRad(GetFov()));
 
 		// Parallax
 		//int lParallax = (int)mpCBParallaxQuality->GetSelectedItem() - 1;
@@ -1537,6 +1575,13 @@ void cLuxMainMenu_Options::ApplyChanges()
 void cLuxMainMenu_Options::SetGammaLabelString(float afX)
 {
 	SetSliderLabelString(mpLGamma, afX, mfGammaMin, mfGammaMax);
+}
+
+//-----------------------------------------------------------------------
+
+void cLuxMainMenu_Options::SetFovLabelString(float afX)
+{
+	SetSliderLabelString(mpLFov, afX, mfFovMin, mfFovMax);
 }
 
 //-----------------------------------------------------------------------
@@ -1792,8 +1837,9 @@ void cLuxMainMenu_Options::DumpInitialValues(cResourceVarsObject &aObj)
 
 
 		///////////////////
-		// Gamma
+		// Gamma & FOV
 		aObj.AddVarFloat("Gamma", gpBase->mpEngine->GetGraphics()->GetLowLevel()->GetGammaCorrection());
+		aObj.AddVarFloat("FOV", cMath::ToDeg(gpBase->mpPlayer->GetFov()));
 	}
 
 	////////////////////////////////
@@ -1884,8 +1930,9 @@ void cLuxMainMenu_Options::DumpCurrentValues(cResourceVarsObject &aObj)
 		aObj.AddVarBool("InsanityActive", mpChBInsanity->IsChecked());
 
 		///////////////////
-		// Gamma
+		// Gamma & FOV
 		aObj.AddVarFloat("Gamma", GetGamma());
+		aObj.AddVarFloat("FOV", GetFov());
 	}
 
 	////////////////////////////////
@@ -1934,9 +1981,9 @@ bool cLuxMainMenu_Options::Window_OnUpdate(iWidget* apWidget, const cGuiMessageD
 	cColor labelCol = mpLTip->GetDefaultFontColor();
 	if(mbTipFadeRestart)
 	{
-		if(mbTipTextReset)
+		if(!mbTipTextReset)
 		{
-			mbTipTextReset = false;
+			mbTipTextReset = true;
 			mpLTip->SetScrollOffset(0);
 		}
 		labelCol = labelCol + cColor(0, aData.mfVal*3);
@@ -2049,6 +2096,19 @@ bool cLuxMainMenu_Options::GammaSlider_OnMove(iWidget* apWidget, const cGuiMessa
 	return true;
 }
 kGuiCallbackDeclaredFuncEnd(cLuxMainMenu_Options, GammaSlider_OnMove);
+
+//-----------------------------------------------------------------------
+
+bool cLuxMainMenu_Options::FovSlider_OnMove(iWidget* apWidget, const cGuiMessageData& aData)
+{
+	float fFov = GetFov();
+	SetFovLabelString(fFov);
+
+	gpBase->mpPlayer->SetFov(cMath::ToRad(fFov));
+
+	return true;
+}
+kGuiCallbackDeclaredFuncEnd(cLuxMainMenu_Options, FovSlider_OnMove);
 
 //-----------------------------------------------------------------------
 
@@ -2167,6 +2227,7 @@ bool cLuxMainMenu_Options::PressCancel(iWidget* apWidget, const cGuiMessageData&
 	//	gpBase->mpMainMenu->RecreateGui();
 	//}
 	gpBase->mpEngine->GetGraphics()->GetLowLevel()->SetGammaCorrection(mInitialValues.GetVarFloat("Gamma"));
+	gpBase->mpPlayer->SetFov(cMath::ToRad(mInitialValues.GetVarFloat("FOV")));
 	gpBase->mpInputHandler->SetMouseSensitivity(mInitialValues.GetVarFloat("MouseSensitivity"));
 #ifdef USE_GAMEPAD
 	gpBase->mpInputHandler->SetGamepadLookSensitivity(mInitialValues.GetVarFloat("GamepadLookSensitivity"));

@@ -86,9 +86,16 @@ namespace hpl {
 				mpSet->DrawGfx(	mpGfxSelection,vPosition - cVector3f(3,0,0.01f),
 								cVector2f(mvSize.x,mvDefaultFontSize.y));
 				DrawDefaultTextHighlight(pItem->GetText(),vPosition,eFontAlign_Left);
+
+				if (pItem->hasDescText()) {
+					DrawDescriptionText(pItem->GetDescText(), vPosition, eFontAlign_Left);
+				}
 			}
 			else
 				DrawDefaultText(pItem->GetText(),vPosition,eFontAlign_Left);
+				if (pItem->hasDescText()) {
+					DrawDescriptionText(pItem->GetDescText(), vPosition, eFontAlign_Left);
+				}
 			
 			vPosition.y += mvDefaultFontSize.y +2;
 		}

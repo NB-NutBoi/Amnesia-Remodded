@@ -97,6 +97,8 @@ namespace hpl {
 		int GetIndex() { return mlIndex; }
 
 		const tWString& GetText()const { return msText; }
+		const tWString& GetDescText()const { return msDescText; }
+		const bool hasDescText()const { return mbHasDesc; }
         cWidgetItemProperty* GetProperty(int alIdx) const;
 
 		void AddProperty(const tWString& asText);
@@ -110,6 +112,7 @@ namespace hpl {
 		void SetSelected(bool abX);
 
 		void SetText(const tWString& asText);
+		void SetDescText(const tWString& asText);
 
 		void SetUserData(void* apData) { mpUserData = apData; }
 		void* GetUserData() { return mpUserData; }
@@ -124,6 +127,8 @@ namespace hpl {
 		bool mbSelected;
 
 		tWString msText;
+		bool mbHasDesc;
+		tWString msDescText;
 		tWidgetItemPropertyVec mvProperties;
 
 		void* mpUserData;

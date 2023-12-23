@@ -109,6 +109,7 @@ public:
 	 */
 	bool StartGame();
 
+	tString msName2;
 	tWString msName;
 	tWString msAuthor;
 	tString msImgFile;
@@ -117,6 +118,9 @@ public:
 	tString msStartMap;
 	tString msStartPos;
 	tString msMapsFolder;
+
+	bool mbCsCompatibilityMode;
+	tString msRemoddedVersion;
 
 	tString msExtraLangFilePrefix;
 	tString msDefaultExtraLanguage;
@@ -181,6 +185,7 @@ public:
 	iLuxUpdateable *AddModule(iLuxUpdateable *apModule, const tString& asContainer);
 	iLuxUpdateable *AddGlobalModule(iLuxUpdateable *apModule);
 
+	tString GetRemoddedVersion();
 
 	void RaiseCrashFlag();
 	void LowerCrashFlag();
@@ -247,6 +252,9 @@ public:
 
 	bool mbShowPreMenu;
 	bool mbShowMenu;
+
+	bool mbCompatibilityMode;
+	float afRemoddedCompatibilityVersion;
 
 	tString msStartMapFile;
 	tString msStartMapFolder;

@@ -58,12 +58,16 @@ namespace hpl {
 
 		bool isQuitMessagePosted();
 		void resetQuitMessagePosted();
+
+		bool isResizeMessagePosted();
+		void resetResizeMessagePosted();
 	public:
 		std::list<SDL_Event> mlstEvents;
 
 	private: 
 		iLowLevelGraphics *mpLowLevelGraphics;
 		bool mbQuitMessagePosted;
+		bool mbResizeMessagePosted;
 	};
 };
 #endif // HPL_LOWLEVELINPUT_SDL_H

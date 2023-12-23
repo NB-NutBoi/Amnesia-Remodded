@@ -24,6 +24,7 @@
 #include "LuxInputHandler.h"
 #include "LuxHintHandler.h"
 #include "LuxHelpFuncs.h"
+#include "LuxPlayer.h"
 
 // TODO: there is some cleanup to do here
 
@@ -160,6 +161,7 @@ void cLuxConfigHandler::SaveMainConfig()
 	cRenderSettings* pRenderSettings = gpBase->mpMapHandler->GetViewport()->GetRenderSettings();
 
 	gpBase->mpMainConfig->SetFloat("Graphics","Gamma",gpBase->mpEngine->GetGraphics()->GetLowLevel()->GetGammaCorrection());
+	gpBase->mpMainConfig->SetFloat("Graphics", "Fov", cMath::ToDeg(gpBase->mpPlayer->GetFov()));
 	gpBase->mpMainConfig->SetInt("Graphics","GBufferType", cRendererDeferred::GetGBufferType());
 	gpBase->mpMainConfig->SetInt("Graphics","NumOfGBufferTextures", cRendererDeferred::GetNumOfGBufferTextures());
 	

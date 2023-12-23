@@ -111,7 +111,7 @@ public:
 	cLuxMap* LoadMap(const tString& asName, bool abLoadEntities);
 	void DestroyMap(cLuxMap* apMap, bool abRunScript);
 
-	void SetCurrentMap(cLuxMap* apMap, bool abRunScript, bool abFirstTime, const tString& asPlayerPos);
+	void SetCurrentMap(cLuxMap* apMap, bool abRunScript, bool abFirstTime, bool abIsLoading, const tString& asPlayerPos);
 	cLuxMap* GetCurrentMap(){ return mpCurrentMap;}
 
 	cViewport* GetViewport(){ return mpViewport;}
