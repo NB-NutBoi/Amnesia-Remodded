@@ -723,7 +723,7 @@ void cLuxScriptHandler::InitScriptFunctions()
 	AddFunc("void AddEntityCollideCallback(string &in asParentName, string &in asChildName, string &in asFunction, bool abDeleteOnCollide, int alStates)",(void *)AddEntityCollideCallback);
 	AddFunc("void RemoveEntityCollideCallback(string &in asParentName, string &in asChildName)", (void *)RemoveEntityCollideCallback);
 
-	//AddFunc("void CreateRope(string &in asName,string &in asStartArea, string &in asEndArea, string &in asStartBody, string &in asEndBody,float afMinTotalLength, float afMaxTotalLength,float afSegmentLength, float afDamping,float afStrength, float afStiffness, string &in asMaterial, float afRadius, float afLengthTileAmount, float afLengthTileSize, string &in asSound,float afSoundStartSpeed, float afSoundStopSpeed,bool abAutoMove, float afAutoMoveAcc, float afAutoMoveMaxSpeed)",(void *)CreateRope);
+	AddFunc("void CreateRope(string &in asName,string &in asStartArea, string &in asEndArea, string &in asStartBody, string &in asEndBody,float afMinTotalLength, float afMaxTotalLength,float afSegmentLength, float afDamping,float afStrength, float afStiffness, string &in asMaterial, float afRadius, float afLengthTileAmount, float afLengthTileSize, string &in asSound,float afSoundStartSpeed, float afSoundStopSpeed,bool abAutoMove, float afAutoMoveAcc, float afAutoMoveMaxSpeed)",(void *)CreateRope);
 
 	AddFunc("void InteractConnectPropWithRope(string &in asName, string& asLeverName, string& asPropName, bool abInteractOnly, float afSpeedMul,float afMinSpeed, float afMaxSpeed, bool abInvert, int alStatesUsed)",(void *)InteractConnectPropWithRope);
 	AddFunc("void InteractConnectPropWithMoveObject(string &in asName, string &in asPropName, string &in asMoveObjectName, bool abInteractOnly,bool abInvert, int alStatesUsed)",(void *)InteractConnectPropWithMoveObject);
@@ -3974,7 +3974,7 @@ void __stdcall cLuxScriptHandler::ConnectEntities(string& asName, string& asMain
 
 //-----------------------------------------------------------------------
 
-/*void __stdcall cLuxScriptHandler::CreateRope(string& asName, 
+void __stdcall cLuxScriptHandler::CreateRope(string& asName, 
 											string& asStartArea, string& asEndArea, 
 											string& asStartBody, string& asEndBody,
 											float afMinTotalLength, float afMaxTotalLength,
@@ -4059,7 +4059,7 @@ void __stdcall cLuxScriptHandler::ConnectEntities(string& asName, string& asMain
 	}
 
 	
-}*/
+}
 
 //-----------------------------------------------------------------------
 

@@ -542,8 +542,7 @@ private:
 	static void __stdcall ConnectEntities(string& asName, string& asMainEntity, string& asConnectEntity, bool abInvertStateSent, int alStatesUsed, string& asCallbackFunc);
 
 
-	// TEMP
-	/*static void __stdcall CreateRope(	string& asName, 
+	static void __stdcall CreateRope(	string& asName, 
 										string& asStartArea, string& asEndArea, 
 										string& asStartBody, string& asEndBody,
 										float afMinTotalLength, float afMaxTotalLength,
@@ -553,7 +552,7 @@ private:
 										float afLengthTileAmount, float afLengthTileSize,
 										string& asSound,float afSoundStartSpeed, float afSoundStopSpeed,
 										bool abAutoMove, float afAutoMoveAcc, float afAutoMoveMaxSpeed
-										);*/
+										);
 
 	//////////////////////////////
 	// Math
